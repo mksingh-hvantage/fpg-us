@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Menu, X, ChevronDown, Phone, LogIn, Rocket } from 'lucide-react';
 import ContactModal from './ContactModal';
+import logoFpgus from '../assets/logo-fpgus.png';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -56,7 +57,7 @@ export default function Header() {
           <div className="flex justify-between items-center h-24">
             <a href="/" className="flex items-center">
               <img
-                src="../src/assets/logo-fpgus.png"
+                src={logoFpgus}
                 alt="Logo"
                 className="h-12"
               />
