@@ -24,7 +24,10 @@ export default function Dashboard() {
     else promises.push(Promise.resolve(null));
 
     Promise.allSettled(promises).then(([statsResult, tasksResult, analyticsResult]) => {
-      if (statsResult.status === 'fulfilled') setStats(statsResult.value as DashboardStats);
+      if (statsResult.status === 'fulfilled') {
+        const data = statsResult.value as DashboardStats;
+        if (data?.orders && data?.contacts && data?.articles) setStats(data);
+      }
       if (tasksResult.status === 'fulfilled') {
         const tasks = tasksResult.value as Task[];
         setMyTasks(Array.isArray(tasks) ? tasks.filter((t) => t.status !== 'COMPLETED' && t.status !== 'CANCELLED').slice(0, 5) : []);
