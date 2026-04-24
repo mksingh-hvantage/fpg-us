@@ -54,7 +54,6 @@ export default function ArticleList() {
   const columns = [
     { key: 'title', label: 'Title', sortable: true },
     { key: 'category', label: 'Category', sortable: true },
-    { key: 'author', label: 'Author' },
     {
       key: 'published', label: 'Status',
       render: (a: Article) => canEdit('Articles') ? (

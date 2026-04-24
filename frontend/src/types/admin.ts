@@ -70,9 +70,12 @@ export interface Article {
   excerpt?: string;
   content: string;
   category: string;
-  readTime?: string;
-  author?: string;
   imageUrl?: string;
+  metaTitle?: string;
+  metaKeywords?: string;
+  metaDescription?: string;
+  imageAlt?: string;
+  imageTitle?: string;
   published: boolean;
   publishedDate?: string;
   createdAt: string;

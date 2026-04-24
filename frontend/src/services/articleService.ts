@@ -24,3 +24,12 @@ export async function updateArticle(id: string, data: Partial<Article>) {
 export async function deleteArticle(id: string) {
   await api.delete(`/articles/${id}`);
 }
+
+export async function uploadArticleImage(file: File) {
+  const formData = new FormData();
+  formData.append('image', file);
+  const res = await api.post('/articles/upload-image', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return res.data as { imageUrl: string };
+}
