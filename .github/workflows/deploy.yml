@@ -45,6 +45,17 @@ jobs:
             -e "ssh -i ~/.ssh/deploy_key" \
             ./backend/ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/var/www/html/thefutureperfectglobal-us/backend/
 
+      - name: Create backend .env on server
+        run: |
+          ssh -i ~/.ssh/deploy_key ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "cat > /var/www/html/thefutureperfectglobal-us/backend/.env << 'ENVEOF'
+          DATABASE_URL=${{ secrets.DATABASE_URL }}
+          JWT_SECRET=${{ secrets.JWT_SECRET }}
+          PORT=3001
+          SENDGRID_API_KEY=${{ secrets.SENDGRID_API_KEY }}
+          SENDGRID_FROM=${{ secrets.SENDGRID_FROM }}
+          STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
+          ENVEOF"
+
       - name: Install dependencies and generate Prisma client
         run: |
           ssh -i ~/.ssh/deploy_key ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
@@ -80,6 +91,13 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
+
+      - name: Create frontend .env
+        run: |
+          cat > frontend/.env << 'EOF'
+          VITE_API_URL=${{ secrets.VITE_API_URL }}
+          VITE_STRIPE_PUBLISHABLE_KEY=${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY }}
+          EOF
 
       - name: Install dependencies
         run: cd frontend && npm install --legacy-peer-deps
