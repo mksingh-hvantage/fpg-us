@@ -1,0 +1,603 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  fullName  String
+  role      Role     @default(ADMIN)
+  avatarUrl String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  assignedTasks   Task[]         @relation("TaskAssignee")
+  createdTasks    Task[]         @relation("TaskCreator")
+  uploadedDocs    Document[]     @relation("DocumentUploader")
+  internalNotes   InternalNote[] @relation("NoteAuthor")
+  auditLogs       AuditLog[]
+  permissions     Permission[]
+  assignedOrders  Order[]        @relation("OrderAssignee")
+  uploadedMail    MailItem[]     @relation("MailUploader")
+  notifications   Notification[] @relation("NotificationCreator")
+  cmsPages        CmsPage[]      @relation("CmsUpdater")
+  dashboardWidgets DashboardWidget[]
+  apiKeys         ApiKey[]       @relation("ApiKeyCreator")
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  EDITOR
+}
+
+model Customer {
+  id                String    @id @default(uuid())
+  email             String    @unique
+  passwordHash      String    @default("")
+  firstName         String
+  lastName          String
+  phone             String?
+  businessName      String?
+  businessType      String?
+  state             String?
+  avatarUrl         String?
+  profileCompleted  Boolean   @default(false)
+  emailVerified     Boolean   @default(false)
+  verificationToken String?
+  resetToken        String?
+  resetTokenExpiry  DateTime?
+  otpCode           String?
+  otpExpiry         DateTime?
+  isActive          Boolean   @default(true)
+  lastLoginAt       DateTime?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  orders            Order[]
+}
+
+model Order {
+  id               String      @id @default(uuid())
+  orderNumber      String      @unique @default(cuid())
+  status           OrderStatus @default(PENDING)
+  packageType      String
+  llcName          String
+  designator       String?
+  managementMethod String?
+  state            String
+  filingFee        Decimal?
+  packagePrice     Decimal?
+  contactFirstName String
+  contactLastName  String
+  contactEmail     String
+  contactPhone     String?
+  companyAddress   Json?
+  members          Json?
+  agentOption      String?
+  agentDetails     Json?
+  taxInfo          Json?
+  expeditedFiling  Json?
+  wantsBanking     Boolean?
+  taxConsultation  String?
+  licenseInfo      Json?
+  addons           Json?
+  total            Decimal?
+  notes            String?
+  assignedToId     String?
+  customerId       String?
+  createdAt        DateTime    @default(now())
+  updatedAt        DateTime    @updatedAt
+
+  // Relations
+  assignedTo       User?       @relation("OrderAssignee", fields: [assignedToId], references: [id])
+  customer         Customer?   @relation(fields: [customerId], references: [id])
+  tasks            Task[]
+  documents        Document[]
+  mailItems        MailItem[]
+  payments         Payment[]
+  invoices         Invoice[]
+}
+
+enum OrderStatus {
+  PENDING
+  PROCESSING
+  FILED
+  COMPLETED
+  CANCELLED
+}
+
+model Contact {
+  id           String        @id @default(uuid())
+  source       String
+  name         String
+  email        String
+  phone        String?
+  subject      String?
+  message      String?
+  businessType String?
+  businessName String?
+  state        String?
+  status       ContactStatus @default(NEW)
+  notes        String?
+  createdAt    DateTime      @default(now())
+}
+
+enum ContactStatus {
+  NEW
+  CONTACTED
+  CONVERTED
+  CLOSED
+}
+
+model Article {
+  id            String    @id @default(uuid())
+  slug          String    @unique
+  title         String
+  excerpt       String?
+  content       String
+  category      String
+  readTime      String?
+  author        String?
+  imageUrl      String?
+  published     Boolean   @default(false)
+  publishedDate DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+model ContractTemplate {
+  id          String   @id @default(uuid())
+  slug        String   @unique
+  name        String
+  category    String
+  description String?
+  content     String?
+  published   Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Industry {
+  id        String   @id @default(uuid())
+  slug      String   @unique
+  name      String
+  icon      String
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model State {
+  id              String   @id @default(uuid())
+  name            String
+  slug            String   @unique
+  filingFee       String
+  processingTime  String
+  annualReportFee String
+  expeditedTime   String?
+  description     String
+  benefits        Json?
+  updatedAt       DateTime @updatedAt
+
+  stateRules      StateFilingRule[]
+}
+
+model Package {
+  id             String   @id @default(uuid())
+  name           String   @unique
+  price          Int      @default(0)
+  processingTime String
+  recommended    Boolean  @default(false)
+  features       Json
+  sortOrder      Int      @default(0)
+  published      Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+}
+
+// ============================================
+// Phase 1: Foundation
+// ============================================
+
+model Task {
+  id           String     @id @default(uuid())
+  title        String
+  description  String?
+  type         TaskType   @default(GENERAL)
+  status       TaskStatus @default(PENDING)
+  priority     TaskPriority @default(MEDIUM)
+  assigneeId   String?
+  createdById  String
+  orderId      String?
+  contactId    String?
+  dueDate      DateTime?
+  completedAt  DateTime?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  assignee     User?      @relation("TaskAssignee", fields: [assigneeId], references: [id])
+  createdBy    User       @relation("TaskCreator", fields: [createdById], references: [id])
+  order        Order?     @relation(fields: [orderId], references: [id])
+}
+
+enum TaskType {
+  COMPLIANCE
+  UPSELL
+  FILING
+  GENERAL
+}
+
+enum TaskStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum TaskPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+model Document {
+  id           String   @id @default(uuid())
+  fileName     String
+  fileUrl      String
+  fileSize     Int?
+  mimeType     String?
+  category     DocumentCategory @default(GENERAL)
+  orderId      String?
+  uploadedById String
+  notes        String?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  order        Order?   @relation(fields: [orderId], references: [id])
+  uploadedBy   User     @relation("DocumentUploader", fields: [uploadedById], references: [id])
+}
+
+enum DocumentCategory {
+  FORMATION
+  LEGAL
+  TAX
+  COMPLIANCE
+  GENERAL
+}
+
+model InternalNote {
+  id        String   @id @default(uuid())
+  content   String
+  entity    String   // "Order" | "Contact"
+  entityId  String
+  authorId  String
+  createdAt DateTime @default(now())
+
+  author    User     @relation("NoteAuthor", fields: [authorId], references: [id])
+}
+
+model AuditLog {
+  id        String   @id @default(uuid())
+  userId    String?
+  action    String
+  entity    String
+  entityId  String?
+  details   Json?
+  ipAddress String?
+  userAgent String?
+  createdAt DateTime @default(now())
+
+  user      User?    @relation(fields: [userId], references: [id])
+}
+
+model Permission {
+  id        String  @id @default(uuid())
+  userId    String
+  module    String
+  canView   Boolean @default(false)
+  canCreate Boolean @default(false)
+  canEdit   Boolean @default(false)
+  canDelete Boolean @default(false)
+
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, module])
+}
+
+// ============================================
+// Phase 2: Communication
+// ============================================
+
+model MailItem {
+  id           String     @id @default(uuid())
+  subject      String
+  description  String?
+  sender       String?
+  scanUrl      String?
+  scanPages    Int?
+  status       MailStatus @default(RECEIVED)
+  orderId      String?
+  taggedEmail  String?
+  receivedDate DateTime   @default(now())
+  openedAt     DateTime?
+  uploadedById String?
+  notes        String?
+  createdAt    DateTime   @default(now())
+  updatedAt    DateTime   @updatedAt
+
+  order        Order?     @relation(fields: [orderId], references: [id])
+  uploadedBy   User?      @relation("MailUploader", fields: [uploadedById], references: [id])
+}
+
+enum MailStatus {
+  RECEIVED
+  OPENED
+  FORWARDED
+  ARCHIVED
+}
+
+model Notification {
+  id          String           @id @default(uuid())
+  title       String
+  message     String
+  type        NotificationType @default(INFO)
+  targetEmail String?
+  targetRole  String?
+  isRead      Boolean          @default(false)
+  readAt      DateTime?
+  link        String?
+  createdById String?
+  createdAt   DateTime         @default(now())
+
+  createdBy   User?            @relation("NotificationCreator", fields: [createdById], references: [id])
+}
+
+enum NotificationType {
+  INFO
+  WARNING
+  DEADLINE
+  SYSTEM
+}
+
+model EmailTemplate {
+  id        String   @id @default(uuid())
+  slug      String   @unique
+  name      String
+  subject   String
+  body      String
+  variables Json?
+  active    Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// ============================================
+// Phase 3: Business Logic
+// ============================================
+
+model Service {
+  id          String   @id @default(uuid())
+  name        String
+  slug        String   @unique
+  description String?
+  category    String?
+  basePrice   Decimal  @default(0)
+  isRecurring Boolean  @default(false)
+  interval    String?
+  published   Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  recommendations Recommendation[]
+}
+
+model Recommendation {
+  id           String   @id @default(uuid())
+  title        String
+  description  String?
+  serviceId    String?
+  targetState  String?
+  targetBizType String?
+  triggerEvent String?
+  isAutomatic  Boolean  @default(false)
+  active       Boolean  @default(true)
+  priority     Int      @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  service      Service? @relation(fields: [serviceId], references: [id])
+  pushes       RecommendationPush[]
+}
+
+model RecommendationPush {
+  id               String   @id @default(uuid())
+  recommendationId String
+  targetEmail      String
+  orderId          String?
+  sentAt           DateTime @default(now())
+  clickedAt        DateTime?
+  convertedAt      DateTime?
+
+  recommendation   Recommendation @relation(fields: [recommendationId], references: [id])
+}
+
+model CmsPage {
+  id          String    @id @default(uuid())
+  slug        String    @unique
+  title       String
+  content     Json?
+  published   Boolean   @default(false)
+  publishedAt DateTime?
+  updatedById String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  updatedBy   User?     @relation("CmsUpdater", fields: [updatedById], references: [id])
+}
+
+model Faq {
+  id        String   @id @default(uuid())
+  question  String
+  answer    String
+  category  String?
+  sortOrder Int      @default(0)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Banner {
+  id        String    @id @default(uuid())
+  title     String
+  message   String
+  type      String    @default("info") // info, warning, success, promo
+  linkUrl   String?
+  linkText  String?
+  startDate DateTime?
+  endDate   DateTime?
+  active    Boolean   @default(true)
+  sortOrder Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+}
+
+// ============================================
+// Phase 4: Payments & Analytics
+// ============================================
+
+model Payment {
+  id                String        @id @default(uuid())
+  orderId           String?
+  stripePaymentId   String?       @unique
+  stripeCustomerId  String?
+  amount            Decimal       @default(0)
+  currency          String        @default("usd")
+  status            PaymentStatus @default(PENDING)
+  paymentMethod     String?
+  receiptUrl        String?
+  failureReason     String?
+  refundedAmount    Decimal?
+  refundReason      String?
+  metadata          Json?
+  paidAt            DateTime?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  order             Order?        @relation(fields: [orderId], references: [id])
+  invoices          Invoice[]
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+  PARTIALLY_REFUNDED
+}
+
+model Invoice {
+  id            String    @id @default(uuid())
+  invoiceNumber String    @unique @default(cuid())
+  paymentId     String?
+  orderId       String?
+  customerName  String
+  customerEmail String
+  items         Json
+  subtotal      Decimal   @default(0)
+  tax           Decimal   @default(0)
+  total         Decimal   @default(0)
+  notes         String?
+  issuedAt      DateTime  @default(now())
+  dueDate       DateTime?
+  paidAt        DateTime?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  payment       Payment?  @relation(fields: [paymentId], references: [id])
+  order         Order?    @relation(fields: [orderId], references: [id])
+}
+
+model AnalyticsSnapshot {
+  id              String   @id @default(uuid())
+  date            DateTime @unique
+  totalOrders     Int      @default(0)
+  newOrders       Int      @default(0)
+  completedOrders Int      @default(0)
+  revenue         Decimal  @default(0)
+  newContacts     Int      @default(0)
+  conversions     Int      @default(0)
+  topStates       Json?
+  topPackages     Json?
+  createdAt       DateTime @default(now())
+}
+
+model DashboardWidget {
+  id        String  @id @default(uuid())
+  userId    String
+  widgetKey String
+  position  Int     @default(0)
+  visible   Boolean @default(true)
+  config    Json?
+
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, widgetKey])
+}
+
+// ============================================
+// Phase 5: Settings & Rules
+// ============================================
+
+model Setting {
+  id    String @id @default(uuid())
+  key   String @unique
+  value String
+  group String @default("general") // general, payment, email, filing
+  label String?
+  type  String @default("string") // string, number, boolean, json
+}
+
+model StateFilingRule {
+  id                 String   @id @default(uuid())
+  stateSlug          String
+  ruleType           String
+  description        String?
+  dueDate            String?
+  fee                Decimal?
+  penaltyFee         Decimal?
+  reminderDaysBefore Int?
+  active             Boolean  @default(true)
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  state              State    @relation(fields: [stateSlug], references: [slug])
+
+  @@unique([stateSlug, ruleType])
+}
+
+model ApiKey {
+  id          String    @id @default(uuid())
+  name        String
+  keyHash     String
+  prefix      String
+  permissions Json?
+  lastUsedAt  DateTime?
+  expiresAt   DateTime?
+  active      Boolean   @default(true)
+  createdById String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  createdBy   User      @relation("ApiKeyCreator", fields: [createdById], references: [id])
+}

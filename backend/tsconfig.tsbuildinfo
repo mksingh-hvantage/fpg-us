@@ -1,0 +1,1 @@
+{"root":["./src/index.ts","./src/middleware/auth.ts","./src/routes/articles.ts","./src/routes/auth.ts","./src/routes/contacts.ts","./src/routes/contracts.ts","./src/routes/dashboard.ts","./src/routes/industries.ts","./src/routes/orders.ts","./src/routes/packages.ts","./src/routes/states.ts","./src/routes/users.ts","./src/utils/jwt.ts"],"errors":true,"version":"5.9.3"}

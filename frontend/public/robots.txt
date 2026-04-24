@@ -1,0 +1,31 @@
+User-agent: *
+Allow: /
+
+# Block admin routes
+Disallow: /admin
+Disallow: /admin/
+Disallow: /administrator
+Disallow: /administrator/
+Disallow: /wp-admin/
+Disallow: /wp-login.php
+Disallow: /dashboard
+Disallow: /dashboard/
+Disallow: /login
+Disallow: /login/
+Disallow: /auth/
+Disallow: /backend/
+Disallow: /panel/
+Disallow: /control/
+Disallow: /manage/
+Disallow: /cms/
+
+# Block sensitive files and directories
+Disallow: /private/
+Disallow: /config/
+Disallow: /.env
+Disallow: /api/admin/
+Disallow: /*?admin*
+Disallow: /*admin*
+
+# Reference to your sitemap
+Sitemap: https://us.thefutureperfectglobal.com/sitemap.xml

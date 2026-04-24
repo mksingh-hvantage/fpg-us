@@ -1,0 +1,62 @@
+Super Admin Panel - Complete Feature Guide
+1. User & Company Management
+    1 View and manage all users
+    2 Edit company (LLC) details
+    3 Activate / deactivate users
+    4 Login as user feature
+2. Leads / Orders Management
+    1 View all form submissions
+    2 Update order status (Pending, In Progress, Completed)
+    3 Assign tasks to staff
+    4 Add internal notes
+3. Document Management
+    1 Upload legal documents
+    2 Assign documents to users
+    3 Allow download and delete
+4. Mailroom Management
+    1 Upload scanned physical mails
+    2 Tag users
+    3 Mark as opened/unopened
+    4 Notify users
+5. Dashboard Control
+    1 Manage alerts and widgets
+    2 Control business health indicators
+    3 Show custom banners
+6. Task / To-Do Management
+    1 Create and assign tasks
+    2 Set task types (compliance, upsell)
+    3 Track completion status
+7. Recommendations System
+    1 Suggest services to users
+    2 Automate based on state/business type
+    3 Manual push options
+8. Services & Pricing
+    1 Add/edit/delete services
+    2 Manage pricing plans
+    3 Create packages
+9. CMS Management
+    1 Edit homepage content
+    2 Manage FAQs and blogs
+    3 Control landing pages
+10. Notifications
+    1 Send email alerts
+    2 In-app notifications
+    3 Deadline reminders
+11. Payments & Invoices
+    1 View payment history
+    2 Generate invoices
+    3 Manage refunds
+12. Settings
+    1 Configure state rules
+    2 Manage API keys
+    3 Email templates
+13. Staff Management
+    1 Create sub-admins
+    2 Assign roles and permissions
+14. Analytics
+    1 Track users, revenue, conversions
+    2 Monitor active businesses
+15. Security & Logs
+    1 Track login history
+    2 Monitor admin actions
+    3 IP tracking
