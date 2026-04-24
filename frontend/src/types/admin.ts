@@ -40,9 +40,16 @@ export interface Order {
   agentOption?: string;
   agentDetails?: Record<string, string>;
   taxInfo?: Record<string, string>;
+  expeditedFiling?: { selected: string; fee: number };
+  wantsBanking?: boolean;
+  taxConsultation?: string;
+  licenseInfo?: Record<string, unknown>;
+  addons?: Record<string, { name: string; price: number }>;
+  total?: string;
   notes?: string;
   assignedToId?: string;
   assignedTo?: { id: string; fullName: string; email: string };
+  customerId?: string;
   createdAt: string;
   updatedAt: string;
 }
