@@ -38,7 +38,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const loadPermissions = async (userId: string) => {
     try {
       const res = await api.get(`/permissions/${userId}`);
-      setPermissions(res.data as Permission[]);
+      setPermissions(Array.isArray(res.data) ? res.data : []);
     } catch {
       setPermissions([]);
     }
@@ -69,6 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const checkPerm = (module: string, key: keyof Permission): boolean => {
     if (user?.role === 'SUPER_ADMIN') return true;
+    if (!Array.isArray(permissions)) return false;
     const perm = permissions.find((p) => p.module === module);
     return perm ? !!perm[key] : false;
   };
