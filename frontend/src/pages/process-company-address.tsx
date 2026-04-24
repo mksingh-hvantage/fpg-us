@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight, Check } from "lucide-react";
 import ProcessLayout from "../components/ProcessLayout";
 import { useOrder } from "../contexts/OrderContext";
-import { US_STATES as usStates } from "../data/usStates";
+import { Country, State } from "country-state-city";
 
 type FormErrors = {
   street?: string;
@@ -17,24 +17,24 @@ export default function ProcessComAdd() {
 const navigate = useNavigate();
 const { order, setCompanyAddress } = useOrder();
 
-const [country,setCountry] = useState(order.companyAddress.country || "United States");
 const [addressType,setAddressType] = useState<'virtual' | 'own'>(order.companyAddress.addressType);
 
+const autoStateName = order.companyAddress.state || order.selectedState?.name || '';
+const autoCountry = autoStateName ? (State.getAllStates().find(s => s.name === autoStateName)?.countryCode || '') : '';
+
+const [country,setCountry] = useState(autoCountry);
 const [street,setStreet] = useState(order.companyAddress.street);
 const [city,setCity] = useState(order.companyAddress.city);
-const [state,setState] = useState(order.companyAddress.state);
+const [state,setState] = useState(autoStateName);
 const [zip,setZip] = useState(order.companyAddress.zip);
+
+const countries = Country.getAllCountries();
+const statesList = country ? State.getStatesOfCountry(country) : [];
 
 const [errors, setErrors] = useState<FormErrors>({});
 const [isZipLoading,setZipLoading] = useState(false);
 
 
-const countries = [
-"United States","Canada","United Kingdom","India","Australia","Germany",
-"France","Italy","Spain","Netherlands","Sweden","Norway","Denmark",
-"Finland","Brazil","Mexico","Japan","China","South Korea","Singapore",
-"UAE","Saudi Arabia","South Africa","New Zealand","Ireland"
-];
 
 /* ---------------- VALIDATION ---------------- */
 
@@ -91,7 +91,6 @@ if(data?.places?.length){
 
 setCity(data.places[0]["place name"]);
 setState(data.places[0]["state"]);
-
 validateField("city",data.places[0]["place name"]);
 validateField("state",data.places[0]["state"]);
 
@@ -269,18 +268,20 @@ Contact Address
 </h3>
 
 <p className="text-sm mb-5">Please provide the address of the person whom we may contact for State, IRS, or legal correspondence relating to your business.</p>
+
+<div className="mb-4">
+<label className="text-sm font-medium">Country</label>
 <select
 value={country}
-onChange={(e)=>setCountry(e.target.value)}
-className="w-full border px-4 py-3 rounded-lg mb-4"
+onChange={(e)=>{setCountry(e.target.value); setState("");}}
+className="w-full border px-4 py-3 rounded-lg mt-1"
 >
-
+<option value="">Select Country</option>
 {countries.map(c=>(
-<option key={c} value={c}>{c}</option>
+<option key={c.isoCode} value={c.isoCode}>{c.name}</option>
 ))}
-
 </select>
-
+</div>
 
 <input
 value={street}
@@ -308,8 +309,8 @@ onChange={(e)=>setState(e.target.value)}
 className="border px-4 py-3 rounded-lg"
 >
 <option value="">Select State</option>
-{usStates.map(s=>(
-<option key={s} value={s}>{s}</option>
+{statesList.map(s=>(
+<option key={s.isoCode} value={s.name}>{s.name}</option>
 ))}
 </select>
 
@@ -353,6 +354,20 @@ Company Address
 </h3>
 
 
+<div className="mb-4">
+<label className="text-sm font-medium">Country</label>
+<select
+value={country}
+onChange={(e)=>{setCountry(e.target.value); setState("");}}
+className="w-full border px-4 py-3 rounded-lg mt-1"
+>
+<option value="">Select Country</option>
+{countries.map(c=>(
+<option key={c.isoCode} value={c.isoCode}>{c.name}</option>
+))}
+</select>
+</div>
+
 <input
 value={street}
 onChange={(e)=>setStreet(e.target.value)}
@@ -376,8 +391,8 @@ onChange={(e)=>setState(e.target.value)}
 className="border px-4 py-3 rounded-lg"
 >
 <option value="">Select State</option>
-{usStates.map(s=>(
-<option key={s} value={s}>{s}</option>
+{statesList.map(s=>(
+<option key={s.isoCode} value={s.name}>{s.name}</option>
 ))}
 </select>
 

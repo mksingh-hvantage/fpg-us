@@ -117,7 +117,7 @@ Monday, April 20*
 <div className="flex pt-8">
 
 <button
-onClick={() => navigate(-1)}
+onClick={() => navigate("/process-coinfo")}
 className="border px-6 py-3 rounded-lg flex items-center gap-2"
 >
 <ChevronLeft size={16}/>

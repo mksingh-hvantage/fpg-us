@@ -25,7 +25,7 @@ const initialOrderState: OrderState = {
   companyInfo: { llcName: '', designator: 'LLC', managementMethod: '', businessPurpose: '', nonprofitHasMembers: '', nonprofitPurpose: '' },
   expeditedFiling: { selected: 'normal', fee: 0 },
   contactInfo: { firstName: '', lastName: '', email: '', phone: '', smsConsent: false },
-  companyAddress: { addressType: 'virtual', country: 'United States', street: '', city: '', state: '', zip: '' },
+  companyAddress: { addressType: 'virtual', country: '', street: '', city: '', state: '', zip: '' },
   members: [],
   agentInfo: {
     option: 'bizee', agentType: 'individual',

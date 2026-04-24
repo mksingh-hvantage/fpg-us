@@ -1,25 +1,11 @@
-import { lazy, Suspense, useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
-import 'react-quill-new/dist/quill.snow.css';
+import { Editor } from '@tinymce/tinymce-react';
 import FormField from '../../../components/admin/FormField';
 import { getArticle, createArticle, updateArticle } from '../../../services/articleService';
 
-const ReactQuill = lazy(() => import('react-quill-new'));
-
 const categories = ['Legal', 'Taxes', 'Marketing', 'Strategy', 'Finance', 'Business'];
-
-const quillModules = {
-  toolbar: [
-    [{ header: [1, 2, 3, false] }],
-    ['bold', 'italic', 'underline', 'strike'],
-    [{ list: 'ordered' }, { list: 'bullet' }],
-    [{ align: [] }],
-    ['blockquote', 'code-block'],
-    ['link', 'image'],
-    ['clean'],
-  ],
-};
 
 export default function ArticleForm() {
   const { id } = useParams<{ id: string }>();
@@ -33,6 +19,8 @@ export default function ArticleForm() {
   const [loading, setLoading] = useState(isEdit);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const editorRef = useRef<any>(null);
 
   useEffect(() => {
     if (id) {
@@ -119,15 +107,34 @@ export default function ArticleForm() {
 
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">Content <span className="text-red-500">*</span></label>
-          <Suspense fallback={<div className="h-[350px] border border-gray-300 rounded-lg animate-pulse bg-gray-50" />}>
-            <ReactQuill
-              theme="snow"
-              value={form.content}
-              onChange={(value: string) => handleChange('content', value)}
-              modules={quillModules}
-              className="bg-white [&_.ql-editor]:min-h-[300px]"
-            />
-          </Suspense>
+          <Editor
+            tinymceScriptSrc="/tinymce/tinymce.min.js"
+            licenseKey="gpl"
+            onInit={(_evt: unknown, editor: unknown) => (editorRef.current = editor)}
+            initialValue={form.content}
+            onEditorChange={(value: string) => handleChange('content', value)}
+            init={{
+              height: 500,
+              menubar: false,
+              plugins: [
+                'advlist', 'anchor', 'autolink', 'charmap', 'code', 'codesample',
+                'directionality', 'emoticons', 'fullscreen', 'help', 'image', 'importcss',
+                'insertdatetime', 'link', 'lists', 'media', 'nonbreaking', 'pagebreak',
+                'preview', 'quickbars', 'searchreplace', 'table',
+                'visualblocks', 'visualchars', 'wordcount',
+              ],
+              toolbar: `
+                undo redo | blocks fontfamily fontsize | bold italic underline strikethrough |
+                forecolor backcolor removeformat | alignleft aligncenter alignright alignjustify |
+                lineheight | bullist numlist outdent indent | subscript superscript |
+                link image media table emoticons charmap codesample |
+                pagebreak nonbreaking anchor insertdatetime |
+                ltr rtl | visualblocks visualchars | searchreplace wordcount |
+                fullscreen preview | code | help
+              `,
+              content_style: 'body { font-family: Helvetica, Arial, sans-serif; font-size: 14px; }',
+            }}
+          />
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

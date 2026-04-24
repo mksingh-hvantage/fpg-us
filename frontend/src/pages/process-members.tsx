@@ -4,20 +4,15 @@ import { ChevronLeft, ChevronRight } from "lucide-react";
 import ProcessLayout from "../components/ProcessLayout";
 import { useOrder } from "../contexts/OrderContext";
 import type { MemberInfo } from "../types/order";
-import { US_STATES as states } from "../data/usStates";
-
-/* ---------------- COUNTRY LIST ---------------- */
-
-const countries = [
-"United States","Canada","United Kingdom","India","Australia","Germany","France","Italy","Spain","Netherlands",
-"Sweden","Norway","Denmark","Finland","Brazil","Mexico","Japan","China","South Korea","Singapore","UAE",
-"Saudi Arabia","South Africa","New Zealand","Ireland"
-];
+import { Country, State } from "country-state-city";
 
 export default function ProcessMember(){
 
 const navigate = useNavigate()
 const { order, setMembers: saveMembers } = useOrder()
+const countries = Country.getAllCountries()
+const autoMemberState = order.selectedState?.name || '';
+const autoMemberCountry = autoMemberState ? (State.getAllStates().find(s => s.name === autoMemberState)?.countryCode || '') : '';
 
 const [memberCount,setMemberCount] = useState<number>(order.members.length || 0)
 const [members,setMembers] = useState<MemberInfo[]>(order.members.length > 0 ? order.members : [])
@@ -44,8 +39,8 @@ firstName:"",
 lastName:"",
 ownership:"",
 useAddress:true,
-country:"United States",
-state:""
+country:autoMemberCountry,
+state:autoMemberState
 })
 
 }
@@ -289,14 +284,16 @@ Country
 
 <select
 value={member.country}
-onChange={(e)=>updateMember(index,"country",e.target.value)}
+onChange={(e)=>{
+updateMember(index,"country",e.target.value)
+updateMember(index,"state","")
+}}
 className="w-full border rounded-lg px-4 py-3 mt-1"
 >
-
+<option value="">Select Country</option>
 {countries.map(c=>(
-<option key={c}>{c}</option>
+<option key={c.isoCode} value={c.isoCode}>{c.name}</option>
 ))}
-
 </select>
 
 </div>
@@ -315,13 +312,10 @@ value={member.state}
 onChange={(e)=>updateMember(index,"state",e.target.value)}
 className="w-full border rounded-lg px-4 py-3 mt-1"
 >
-
 <option value="">Select State</option>
-
-{states.map(s=>(
-<option key={s}>{s}</option>
+{State.getStatesOfCountry(member.country).map(s=>(
+<option key={s.isoCode} value={s.name}>{s.name}</option>
 ))}
-
 </select>
 
 </div>

@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import ProcessLayout from "../components/ProcessLayout";
 import { useOrder } from "../contexts/OrderContext";
-import { US_STATES as usStates } from "../data/usStates";
+import { Country, State } from "country-state-city";
 
 export default function EINSection() {
 
@@ -22,23 +22,20 @@ const [firstName,setFirstName] = useState(order.taxIdInfo.firstName)
 const [lastName,setLastName] = useState(order.taxIdInfo.lastName)
 const [ssn,setSSN] = useState(order.taxIdInfo.ssn)
 const [itin,setITIN] = useState(order.taxIdInfo.itin)
-const [country,setCountry] = useState(order.taxIdInfo.country)
+const autoSs4State = order.taxIdInfo.state || order.selectedState?.name || '';
+const autoSs4Country = autoSs4State ? (State.getAllStates().find(s => s.name === autoSs4State)?.countryCode || '') : '';
+
+const [country,setCountry] = useState(autoSs4Country)
 const [street,setStreet] = useState(order.taxIdInfo.street)
 const [city,setCity] = useState(order.taxIdInfo.city)
-const [state,setState] = useState(order.taxIdInfo.state)
+const [state,setState] = useState(autoSs4State)
 const [zip,setZip] = useState(order.taxIdInfo.zip)
+
+const countries = Country.getAllCountries()
+const ss4States = country ? State.getStatesOfCountry(country) : []
 
 const [errors,setErrors] = useState<Record<string, string>>({})
 
-/* COUNTRIES */
-
-const countries = [
-"United States","India","Canada","United Kingdom","Australia","Germany","France","Italy","Spain",
-"Netherlands","Belgium","Switzerland","Sweden","Norway","Denmark","Finland","Ireland","Portugal",
-"Austria","Poland","Czech Republic","Hungary","Greece","Turkey","Israel","United Arab Emirates",
-"Saudi Arabia","Singapore","Malaysia","Thailand","Indonesia","Philippines","Japan","South Korea",
-"China","Vietnam","Mexico","Brazil","Argentina","Chile","South Africa","New Zealand"
-]
 
 /* VALIDATION */
 
@@ -261,23 +258,20 @@ Physical Street Address
 </div>
 
 
-<div className="mb-6">
-
-<label className="text-base font-medium">Country</label>
-
+<div className="mb-4">
+<label className="text-sm font-medium">Country</label>
 <select
 value={country}
-onChange={(e)=>setCountry(e.target.value)}
+onChange={(e)=>{setCountry(e.target.value); setState("");}}
 className="border rounded-lg w-full px-4 py-3 mt-1"
 >
 <option value="">Select Country</option>
-{countries.map((c)=>(<option key={c}>{c}</option>))}
+{countries.map(c=>(
+<option key={c.isoCode} value={c.isoCode}>{c.name}</option>
+))}
 </select>
-
 {errors.country && <p className="text-red-500 text-xs mt-1">{errors.country}</p>}
-
 </div>
-
 
 <div className="grid grid-cols-2 gap-4">
 
@@ -321,7 +315,9 @@ onChange={(e)=>setState(e.target.value)}
 className="border rounded-lg w-full px-4 py-3 mt-1"
 >
 <option value="">Select State</option>
-{usStates.map(s=>(<option key={s} value={s}>{s}</option>))}
+{ss4States.map(s=>(
+<option key={s.isoCode} value={s.name}>{s.name}</option>
+))}
 </select>
 {errors.state && <p className="text-red-500 text-xs mt-1">{errors.state}</p>}
 </div>

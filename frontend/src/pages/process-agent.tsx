@@ -19,7 +19,6 @@ lastName?:string
 companyName?:string
 street?:string
 city?:string
-country?:string
 state?:string
 zip?:string
 }
@@ -37,7 +36,6 @@ const toggle=(i:number)=>{
 setOpen(open===i?null:i)
 }
 
-const [country] = useState(order.agentInfo.country)
 const [firstName,setFirstName] = useState(order.agentInfo.firstName)
 const [lastName,setLastName] = useState(order.agentInfo.lastName)
 const [companyName,setCompanyName] = useState(order.agentInfo.companyName)
@@ -55,8 +53,6 @@ const validate=()=>{
 const newErrors:FormErrors={}
 
 if(agentOption==="self"){
-
-if(!country) newErrors.country="Country is required"
 
 if(agentType==="individual"){
 
@@ -104,7 +100,7 @@ setAgentInfo({
   city,
   state,
   zip,
-  country,
+  country: 'US',
 })
 
 navigate("/process-ss4")
