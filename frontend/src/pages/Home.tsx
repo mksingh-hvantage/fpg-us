@@ -173,7 +173,7 @@ export default function Home() {
     {/* Top Badge */}
     <div className="text-center mb-8">
       <div className="inline-block bg-white/10 backdrop-blur-md px-6 py-2 rounded-full mb-6 text-cyan-300 font-semibold border border-white/20 shadow">
-        🚀 Trusted by 500+ Business Owners
+        🚀 Trusted by 1000+ Business Owners
       </div>
 
       {/* Headline */}
