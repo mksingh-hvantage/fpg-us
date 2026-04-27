@@ -44,7 +44,7 @@ export default function ContactFormSection() {
   </div>
 
   <h2 className="text-5xl font-black text-gray-900 mb-6">
-    Have Questions?<br />We're Here to Help!
+    <span className='text-cyan-600'>Have Questions?</span><br />We're Here to Help!
   </h2>
 
   <p className="text-xl text-gray-700 mb-8 leading-relaxed">

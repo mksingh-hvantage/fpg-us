@@ -108,7 +108,7 @@ export default function Testimonials() {
             ⭐ Trusted by Thousands
           </div>
           <h2 className="text-5xl font-black text-gray-900 mb-3">
-            What Our Customers Say
+            What Our Customers <span className="text-cyan-600">Say</span>
           </h2>
           <p className="text-gray-600 text-lg">
             Based on 23,143 verified reviews
