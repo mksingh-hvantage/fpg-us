@@ -3,10 +3,57 @@ import { Helmet } from "react-helmet-async";
 import { useState } from 'react';
 import GetStartedModal from '../components/GetStartedModal';
 
+/* ─── Hero animation keyframes ─── */
+const heroStyles = `
+  @keyframes es-float {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(-16px) rotate(5deg); }
+  }
+  @keyframes es-float2 {
+    0%, 100% { transform: translateY(0px) rotate(0deg); }
+    50% { transform: translateY(12px) rotate(-7deg); }
+  }
+  @keyframes es-pulse-ring {
+    0%, 100% { opacity: 0.3; transform: scale(1); }
+    50% { opacity: 0.55; transform: scale(1.07); }
+  }
+  @keyframes es-fade-up {
+    from { opacity: 0; transform: translateY(26px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes es-badge-pop {
+    0%   { opacity: 0; transform: scale(0.8) translateY(6px); }
+    70%  { transform: scale(1.05) translateY(-2px); }
+    100% { opacity: 1; transform: scale(1) translateY(0); }
+  }
+  @keyframes es-shimmer {
+    0%   { background-position: -200% center; }
+    100% { background-position: 200% center; }
+  }
+  @keyframes es-counter-slide {
+    from { opacity: 0; transform: translateX(-12px); }
+    to   { opacity: 1; transform: translateX(0); }
+  }
+  .es-float  { animation: es-float  5s ease-in-out infinite; }
+  .es-float2 { animation: es-float2 6.5s ease-in-out infinite; }
+  .es-pulse-ring { animation: es-pulse-ring 4s ease-in-out infinite; }
+  .es-fade-up-1 { animation: es-fade-up 0.6s ease both; }
+  .es-fade-up-2 { animation: es-fade-up 0.6s 0.15s ease both; }
+  .es-fade-up-3 { animation: es-fade-up 0.6s 0.3s  ease both; }
+  .es-badge     { animation: es-badge-pop 0.65s 0.05s ease both; }
+  .es-counter   { animation: es-counter-slide 0.5s ease both; }
+  .es-shimmer-btn {
+    background-size: 200% auto;
+    animation: es-shimmer 3s linear infinite;
+  }
+`;
+
 export default function EssentialServices() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBusinessType, setSelectedBusinessType] = useState<string>('');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
+
+  const openModal = () => { setSelectedBusinessType(''); setIsModalOpen(true); };
 
   const services = [
     {
@@ -54,55 +101,50 @@ export default function EssentialServices() {
   ];
 
   const howItWorksSteps = [
-  {
-    icon: "📝",
-    title: "Tell Us About Your Business or Service Needs",
-    description:
-      "Answer a few quick questions about your business goals or the services you need. Our platform helps identify the right business formation, compliance, or legal support solutions tailored to your situation."
-  },
-  {
-    icon: "⚙️",
-    title: "Choose the Right Business Service Package",
-    description:
-      "Select from affordable business formation and support packages designed for startups, entrepreneurs, and growing companies. Our transparent pricing ensures you know exactly what services are included."
-  },
-  {
-    icon: "🚀",
-    title: "We Handle the Filing and Setup Process",
-    description:
-      "Our experts prepare and submit your business registration documents, handle required filings, and guide you through compliance requirements so you can focus on launching and growing your company."
-  },
-  {
-    icon: "📊",
-    title: "Manage and Grow Your Business with Ongoing Support",
-    description:
-      "Access your secure online dashboard to manage documents, track filings, and receive reminders for important deadlines. Our tools help keep your business compliant and ready for long-term growth."
-  }
-];
+    {
+      icon: "📝",
+      title: "Tell Us About Your Business or Service Needs",
+      description: "Answer a few quick questions about your business goals or the services you need. Our platform helps identify the right business formation, compliance, or legal support solutions tailored to your situation."
+    },
+    {
+      icon: "⚙️",
+      title: "Choose the Right Business Service Package",
+      description: "Select from affordable business formation and support packages designed for startups, entrepreneurs, and growing companies. Our transparent pricing ensures you know exactly what services are included."
+    },
+    {
+      icon: "🚀",
+      title: "We Handle the Filing and Setup Process",
+      description: "Our experts prepare and submit your business registration documents, handle required filings, and guide you through compliance requirements so you can focus on launching and growing your company."
+    },
+    {
+      icon: "📊",
+      title: "Manage and Grow Your Business with Ongoing Support",
+      description: "Access your secure online dashboard to manage documents, track filings, and receive reminders for important deadlines. Our tools help keep your business compliant and ready for long-term growth."
+    }
+  ];
 
   const confusionPoints = [
-  {
-    icon: '✅',
-    problem: 'Complex Legal Terms & Legal Jargon',
-    solution: 'We simplify complicated legal language into clear, easy-to-understand guidance for individuals and businesses'
-  },
-  {
-    icon: '✅',
-    problem: 'Unexpected Legal Fees & Hidden Costs',
-    solution: 'Transparent and affordable legal pricing with no hidden charges so you always know the total cost upfront'
-  },
-  {
-    icon: '✅',
-    problem: 'Missed Legal Deadlines & Compliance Risks',
-    solution: 'Automated alerts and expert monitoring help you stay compliant with legal deadlines and regulatory requirements'
-  },
-  {
-    icon: '✅',
-    problem: 'Time-Consuming Legal Paperwork & Documentation',
-    solution: 'We manage your legal forms, document preparation, and government filings to save you time and effort'
-  }
-];
-
+    {
+      icon: '✅',
+      problem: 'Complex Legal Terms & Legal Jargon',
+      solution: 'We simplify complicated legal language into clear, easy-to-understand guidance for individuals and businesses'
+    },
+    {
+      icon: '✅',
+      problem: 'Unexpected Legal Fees & Hidden Costs',
+      solution: 'Transparent and affordable legal pricing with no hidden charges so you always know the total cost upfront'
+    },
+    {
+      icon: '✅',
+      problem: 'Missed Legal Deadlines & Compliance Risks',
+      solution: 'Automated alerts and expert monitoring help you stay compliant with legal deadlines and regulatory requirements'
+    },
+    {
+      icon: '✅',
+      problem: 'Time-Consuming Legal Paperwork & Documentation',
+      solution: 'We manage your legal forms, document preparation, and government filings to save you time and effort'
+    }
+  ];
 
   const stats = [
     { number: '500+', label: 'Businesses Formed' },
@@ -176,161 +218,147 @@ export default function EssentialServices() {
 
   return (
     <div className="bg-white">
+      <style>{heroStyles}</style>
+
       <Helmet>
-  {/* Primary SEO */}
-  <title>
-    Essential Business Services in USA – Compliance & Support | The Future Perfect Global
-  </title>
+        <title>Essential Business Services in USA – Compliance & Support | The Future Perfect Global</title>
+        <meta name="description" content="Get essential business services in the USA with The Future Perfect Global. Expert support for EIN assistance, registered agent services, compliance management, annual filings, and ongoing business support." />
+        <link rel="canonical" href="https://us.thefutureperfectglobal.com/essential-services" />
+        <meta name="keywords" content="essential business services USA, registered agent USA, US business compliance services, EIN assistance USA, annual filing services USA, corporate compliance USA, business support services USA" />
+        <link rel="alternate" href="https://us.thefutureperfectglobal.com/essential-services" hrefLang="en-us" />
+        <link rel="alternate" href="https://us.thefutureperfectglobal.com/essential-services" hrefLang="x-default" />
+        <meta name="robots" content="index, follow" />
+        <meta property="og:locale" content="en_US" />
+        <meta property="og:type" content="website" />
+        <meta property="og:title" content="Essential Business Services in USA – Compliance & Ongoing Support" />
+        <meta property="og:description" content="Maintain your US business with expert essential services. Registered agent, EIN support, compliance management, and annual filings handled professionally." />
+        <meta property="og:url" content="https://us.thefutureperfectglobal.com/essential-services" />
+        <meta property="og:site_name" content="The Future Perfect Global – USA Essential Business Services" />
+        <meta property="og:image" content="https://thefutureperfectglobal.ae/uploads/images/logo1.webp" />
+        <meta property="og:image:alt" content="Essential Business Support Services in USA by The Future Perfect Global" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:site" content="@FPGCompanySetup" />
+        <meta name="twitter:title" content="Essential Business Services in USA – Compliance & Support" />
+        <meta name="twitter:description" content="Professional essential business services in the USA including registered agent support, compliance management, EIN assistance, and annual filings." />
+        <meta name="twitter:image" content="https://thefutureperfectglobal.ae/uploads/images/logo1.webp" />
+        <script type="application/ld+json">{`{
+          "@context": "https://schema.org",
+          "@type": "Service",
+          "name": "Essential Business Services in USA",
+          "url": "https://us.thefutureperfectglobal.com/essential-services",
+          "provider": {
+            "@type": "Organization",
+            "name": "The Future Perfect Global",
+            "url": "https://us.thefutureperfectglobal.com/",
+            "logo": "https://thefutureperfectglobal.ae/uploads/images/logo1.webp"
+          },
+          "description": "Comprehensive essential business services in the USA including registered agent services, EIN assistance, compliance management, annual filings, and ongoing business support.",
+          "areaServed": ["United States","California","Texas","Florida","New York","Delaware","Nevada","Wyoming"],
+          "serviceType": ["Registered Agent Services","Business Compliance Management","EIN Assistance","Annual Filing Services","Ongoing Business Support"]
+        }`}</script>
+      </Helmet>
 
-  <meta
-    name="description"
-    content="Get essential business services in the USA with The Future Perfect Global. Expert support for EIN assistance, registered agent services, compliance management, annual filings, and ongoing business support."
-  />
+      {/* ═══════════════════════════════════════════
+          HERO SECTION — animated, no yellow
+      ═══════════════════════════════════════════ */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-cyan-700 via-cyan-500 to-cyan-400 py-10 min-h-[520px] flex items-center">
 
-  {/* Canonical */}
-  <link
-    rel="canonical"
-    href="https://us.thefutureperfectglobal.com/essential-services"
-  />
+        {/* Animated background rings */}
+        <div className="es-pulse-ring absolute -top-24 -left-24 w-96 h-96 rounded-full bg-white/10 pointer-events-none" />
+        <div className="es-pulse-ring absolute -bottom-20 -right-20 w-[28rem] h-[28rem] rounded-full bg-cyan-800/20 pointer-events-none" style={{ animationDelay: '2s' }} />
 
-  {/* Keywords */}
-  <meta
-    name="keywords"
-    content="essential business services USA, registered agent USA, US business compliance services, EIN assistance USA, annual filing services USA, corporate compliance USA, business support services USA"
-  />
+        {/* Floating geometric shapes */}
+        <div className="es-float  absolute top-10  right-[30%] w-10 h-10 rounded-xl bg-white/20 pointer-events-none" style={{ animationDelay: '0.4s' }} />
+        <div className="es-float2 absolute bottom-14 left-[22%] w-7  h-7  rounded-full bg-cyan-900/20 pointer-events-none" style={{ animationDelay: '1s' }} />
+        <div className="es-float  absolute top-1/3 left-10 w-5 h-5 rounded bg-white/15 rotate-45 pointer-events-none" style={{ animationDelay: '1.6s' }} />
+        <div className="es-float2 absolute top-16 right-16 w-6 h-6 rounded-full bg-white/20 pointer-events-none" style={{ animationDelay: '0.8s' }} />
 
-  {/* Hreflang */}
-  <link
-    rel="alternate"
-    href="https://us.thefutureperfectglobal.com/essential-services"
-    hrefLang="en-us"
-  />
-  <link
-    rel="alternate"
-    href="https://us.thefutureperfectglobal.com/essential-services"
-    hrefLang="x-default"
-  />
-
-  <meta name="robots" content="index, follow" />
-
-  {/* Open Graph */}
-  <meta property="og:locale" content="en_US" />
-  <meta property="og:type" content="website" />
-  <meta
-    property="og:title"
-    content="Essential Business Services in USA – Compliance & Ongoing Support"
-  />
-  <meta
-    property="og:description"
-    content="Maintain your US business with expert essential services. Registered agent, EIN support, compliance management, and annual filings handled professionally."
-  />
-  <meta
-    property="og:url"
-    content="https://us.thefutureperfectglobal.com/essential-services"
-  />
-  <meta
-    property="og:site_name"
-    content="The Future Perfect Global – USA Essential Business Services"
-  />
-  <meta
-    property="og:image"
-    content="https://thefutureperfectglobal.ae/uploads/images/logo1.webp"
-  />
-  <meta
-    property="og:image:alt"
-    content="Essential Business Support Services in USA by The Future Perfect Global"
-  />
-
-  {/* Twitter */}
-  <meta name="twitter:card" content="summary_large_image" />
-  <meta name="twitter:site" content="@FPGCompanySetup" />
-  <meta
-    name="twitter:title"
-    content="Essential Business Services in USA – Compliance & Support"
-  />
-  <meta
-    name="twitter:description"
-    content="Professional essential business services in the USA including registered agent support, compliance management, EIN assistance, and annual filings."
-  />
-  <meta
-    name="twitter:image"
-    content="https://thefutureperfectglobal.ae/uploads/images/logo1.webp"
-  />
-
-  {/* JSON-LD Structured Data */}
-  <script type="application/ld+json">
-    {`{
-      "@context": "https://schema.org",
-      "@type": "Service",
-      "name": "Essential Business Services in USA",
-      "url": "https://us.thefutureperfectglobal.com/essential-services",
-      "provider": {
-        "@type": "Organization",
-        "name": "The Future Perfect Global",
-        "url": "https://us.thefutureperfectglobal.com/",
-        "logo": "https://thefutureperfectglobal.ae/uploads/images/logo1.webp"
-      },
-      "description": "Comprehensive essential business services in the USA including registered agent services, EIN assistance, compliance management, annual filings, and ongoing business support.",
-      "areaServed": [
-        "United States",
-        "California",
-        "Texas",
-        "Florida",
-        "New York",
-        "Delaware",
-        "Nevada",
-        "Wyoming"
-      ],
-      "serviceType": [
-        "Registered Agent Services",
-        "Business Compliance Management",
-        "EIN Assistance",
-        "Annual Filing Services",
-        "Ongoing Business Support"
-      ]
-    }`}
-  </script>
-</Helmet>
-
-      <section className="relative overflow-hidden bg-gradient-to-br from-cyan-500 via-cyan-400 to-yellow-400 py-16">
-        <div className="absolute inset-0 bg-gradient-to-r from-cyan-600/20 to-yellow-600/20"></div>
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10 w-full">
           <div className="max-w-6xl mx-auto text-center text-white">
-            <h1 className="text-5xl font-black mb-6 leading-xl drop-shadow-lg">
-              Start Your Business Smart – Easy Company Registration & Legal Compliance Services
+
+            {/* Animated badge */}
+            <div className="es-badge inline-flex items-center gap-2 bg-white/20 backdrop-blur-sm text-white font-semibold text-sm px-5 py-2 rounded-full mb-6 border border-white/30">
+              <span className="inline-block w-2 h-2 rounded-full bg-white animate-pulse" />
+              Trusted by 500+ Entrepreneurs Across All 50 States
+            </div>
+
+            {/* Heading */}
+            <h1 className="es-fade-up-1 text-5xl font-black mb-6 leading-tight drop-shadow-lg">
+              Start Your Business Smart – Easy Company Registration &{' '}
+              <span className="relative inline-block">
+                Legal Compliance Services
+                <span
+                  className="absolute left-0 -bottom-1 h-1 rounded-full bg-white/40 w-full"
+                  style={{ animation: 'es-pulse-ring 3s ease-in-out infinite' }}
+                />
+              </span>
             </h1>
-            <p className="text-2xl mb-8 text-cyan-50 leading-relaxed">
+
+            {/* Subtext */}
+            <p className="es-fade-up-2 text-2xl mb-8 text-cyan-50 leading-relaxed max-w-4xl mx-auto">
               From EIN Registration to Annual Report Filing, Our Tools Help You Start, Manage, and Keep Your Business Compliant — All in One Place.
             </p>
+
+            {/* Trust chips */}
+            <div className="es-fade-up-2 flex flex-wrap justify-center gap-3 mb-10">
+              {['Fast Filing', 'All 50 States', 'Transparent Pricing', '24/7 Support'].map((chip) => (
+                <span
+                  key={chip}
+                  className="bg-white/20 backdrop-blur-sm text-white text-sm font-medium px-4 py-1.5 rounded-full border border-white/30"
+                >
+                  ✓ {chip}
+                </span>
+              ))}
+            </div>
+
+            {/* CTA */}
             <button
-              onClick={() => {
-                setSelectedBusinessType('');
-                setIsModalOpen(true);
+              onClick={openModal}
+              className="es-fade-up-3 es-shimmer-btn inline-block text-white px-12 py-5 rounded-full font-black text-xl shadow-2xl hover:scale-105 active:scale-100 transition-transform duration-300"
+              style={{
+                background: 'linear-gradient(90deg,#0e7490 0%,#06b6d4 40%,#0891b2 70%,#0e7490 100%)',
               }}
-              className="inline-block bg-white text-cyan-600 px-12 py-5 rounded-full font-black text-xl hover:bg-gray-900 hover:text-white transition-all shadow-2xl"
             >
               GET STARTED NOW
             </button>
+
+            {/* Floating mini stat cards */}
+            <div className="es-fade-up-3 flex justify-center gap-6 mt-12 flex-wrap">
+              {stats.map((stat, i) => (
+                <div
+                  key={i}
+                  className="es-float bg-white/20 backdrop-blur-sm border border-white/30 rounded-2xl px-6 py-4 text-center"
+                  style={{ animationDelay: `${i * 0.3}s` }}
+                >
+                  <p className="text-2xl font-black text-white">{stat.number}</p>
+                  <p className="text-xs text-cyan-100 font-semibold mt-0.5">{stat.label}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </section>
 
+      {/* ═══════════════════════════════════════════
+          SERVICES GRID
+      ═══════════════════════════════════════════ */}
       <section className="py-20 bg-cyan-100/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-5xl font-black text-gray-900 mb-4">Services to Keep Your Business Running</h2>
+            <h2 className="text-5xl font-black text-gray-900 mb-4">
+              Services to Keep Your Business{' '}
+              <span className="text-cyan-600">Business Running</span>
+            </h2>
             <p className="text-xl text-gray-700 max-w-3xl mx-auto">
               From getting your Tax ID to protecting your brand, we provide all the essential services your business needs.
             </p>
           </div>
-
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {services.map((service, index) => (
               <div key={index} className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all border border-gray-100">
                 <div className="text-5xl mb-4">{service.icon}</div>
                 <h3 className="text-2xl font-black text-gray-900 mb-3">{service.title}</h3>
                 <p className="text-gray-700 mb-6 leading-relaxed">{service.description}</p>
-
                 <div className="mb-6">
                   <ul className="space-y-2">
                     {service.features.map((feature, idx) => (
@@ -341,7 +369,6 @@ export default function EssentialServices() {
                     ))}
                   </ul>
                 </div>
-
                 <Link
                   to={service.link}
                   className="inline-block w-full text-center bg-cyan-600 text-white px-6 py-3 rounded-full font-bold hover:bg-gray-600 transition-all"
@@ -354,13 +381,17 @@ export default function EssentialServices() {
         </div>
       </section>
 
+      {/* ═══════════════════════════════════════════
+          CONFUSION POINTS
+      ═══════════════════════════════════════════ */}
       <section className="py-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-5xl font-black text-gray-900 mb-6">Start Your Business or Nonprofit the Right Way — Get the Formation Services You Actually Need</h2>
-            
+            <h2 className="text-5xl font-black text-gray-900 mb-6">
+              Start Your Business or Nonprofit the Right Way — Get the Formation Services You{' '}
+              <span className="text-cyan-600">Actually Need</span>
+            </h2>
           </div>
-
           <div className="grid md:grid-cols-2 gap-8 max-w-5xl mx-auto">
             {confusionPoints.map((point, index) => (
               <div key={index} className="bg-gradient-to-br from-gray-50 to-cyan-50 rounded-2xl p-8 border-2 border-cyan-200 hover:border-cyan-400 transition-all">
@@ -377,13 +408,9 @@ export default function EssentialServices() {
               </div>
             ))}
           </div>
-
           <div className="text-center mt-12">
             <button
-              onClick={() => {
-                setSelectedBusinessType('');
-                setIsModalOpen(true);
-              }}
+              onClick={openModal}
               className="inline-block bg-cyan-600 text-white px-10 py-4 rounded-full font-bold text-lg hover:bg-gray-900 transition-all shadow-lg"
             >
               Get Started Today
@@ -392,169 +419,159 @@ export default function EssentialServices() {
         </div>
       </section>
 
+      {/* ═══════════════════════════════════════════
+          STATS / WHY US — dark section
+      ═══════════════════════════════════════════ */}
       <section className="py-20 bg-gray-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-5xl font-black mb-6">Why Thousands of Entrepreneurs Choose The Future Perfect Global</h2>
+            <h2 className="text-5xl font-black mb-6">
+              Why Thousands of Entrepreneurs Choose The Future{' '}
+              <span className="text-cyan-400">Perfect Global</span>
+            </h2>
             <p className="text-xl text-gray-300 max-w-3xl mx-auto">
               Join over 500+ business owners who trust The Future Perfect Global for their essential business services
             </p>
           </div>
-
           <div className="grid md:grid-cols-4 gap-8">
             {stats.map((stat, index) => (
               <div key={index} className="text-center">
-                <div className="bg-gradient-to-br from-cyan-500 to-cyan-600 rounded-2xl p-8 shadow-xl">
+                <div className="bg-gradient-to-br from-cyan-600 to-cyan-700 rounded-2xl p-8 shadow-xl">
                   <div className="text-5xl font-black mb-2">{stat.number}</div>
                   <div className="text-cyan-100 font-semibold">{stat.label}</div>
                 </div>
               </div>
             ))}
           </div>
-
-          
         </div>
       </section>
 
+      {/* ═══════════════════════════════════════════
+          HOW IT WORKS
+      ═══════════════════════════════════════════ */}
       <section className="py-24 bg-gradient-to-b from-gray-50 to-white">
-  <div className="max-w-7xl mx-auto px-6 lg:px-8">
-
-    {/* Heading */}
-    <div className="text-center max-w-6xl mx-auto mb-10">
-      <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900">
-        How Our Business Formation Process Works
-      </h2>
-      <p className="mt-6 text-lg text-gray-600">
-        Starting a business or managing essential services shouldn't be complicated.
-        Our streamlined platform helps entrepreneurs register, launch, and manage
-        their companies with expert support at every step.
-      </p>
-    </div>
-
-    {/* Steps */}
-    <div className="grid md:grid-cols-4 gap-8 mb-10">
-
-      {howItWorksSteps.map((step, index) => (
-        <div key={index} className="relative text-center">
-
-          
-
-          {/* Icon */}
-          <div className="mx-auto w-16 h-16 flex items-center justify-center rounded-full bg-cyan-600 text-white text-2xl shadow-lg mb-6">
-            {step.icon}
+        <div className="max-w-7xl mx-auto px-6 lg:px-8">
+          <div className="text-center max-w-6xl mx-auto mb-10">
+            <h2 className="text-4xl md:text-5xl font-extrabold text-gray-900">
+              How Our Business Formation{' '}
+              <span className="text-cyan-600">Process Works</span>
+            </h2>
+            <p className="mt-6 text-lg text-gray-600">
+              Starting a business or managing essential services shouldn't be complicated.
+              Our streamlined platform helps entrepreneurs register, launch, and manage
+              their companies with expert support at every step.
+            </p>
           </div>
 
-          {/* Content */}
-          <h3 className="text-xl font-bold text-gray-900 mb-3">
-            {step.title}
-          </h3>
+          <div className="grid md:grid-cols-4 gap-8 mb-10">
+            {howItWorksSteps.map((step, index) => (
+              <div key={index} className="relative text-center">
+                <div className="mx-auto w-16 h-16 flex items-center justify-center rounded-full bg-cyan-600 text-white text-2xl shadow-lg mb-6">
+                  {step.icon}
+                </div>
+                <h3 className="text-xl font-bold text-gray-900 mb-3">{step.title}</h3>
+                <p className="text-gray-600 text-sm leading-relaxed">{step.description}</p>
+              </div>
+            ))}
+          </div>
 
-          <p className="text-gray-600 text-sm leading-relaxed">
-            {step.description}
-          </p>
+          <div className="grid lg:grid-cols-2 gap-12 items-center bg-blue-100/50 p-8 rounded-xl">
+            <div>
+              <h3 className="text-3xl font-extrabold text-gray-900 mb-4">
+                Trusted Business Services{' '}
+                <span className="text-cyan-600">for Entrepreneurs</span>
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Thousands of entrepreneurs rely on our platform to start businesses,
+                manage legal compliance, and access essential services that support
+                long-term growth.
+              </p>
+              <ul className="space-y-3 text-gray-700">
+                <li>✔ Business formation and registration</li>
+                <li>✔ Legal compliance and filing support</li>
+                <li>✔ Secure document management</li>
+                <li>✔ Expert guidance for entrepreneurs</li>
+              </ul>
+            </div>
+            <div className="bg-white rounded-3xl shadow-2xl p-10 border border-gray-100">
+              <p className="text-5xl font-extrabold text-cyan-600 mb-2">500+</p>
+              <p className="text-xl font-semibold text-gray-900 mb-4">Businesses Supported</p>
+              <p className="text-gray-600">
+                Our platform has helped over one million businesses access essential
+                formation and compliance services, making entrepreneurship easier and
+                more accessible worldwide.
+              </p>
+            </div>
+          </div>
         </div>
-      ))}
+      </section>
 
-    </div>
-
-    {/* Bottom Feature Box */}
-    <div className="grid lg:grid-cols-2 gap-12 items-center bg-blue-100/50 p-8 rounded-xl">
-
-      {/* Left Content */}
-      <div>
-        <h3 className="text-3xl font-extrabold text-gray-900 mb-4">
-          Trusted Business Services for Entrepreneurs
-        </h3>
-
-        <p className="text-gray-600 mb-6">
-          Thousands of entrepreneurs rely on our platform to start businesses,
-          manage legal compliance, and access essential services that support
-          long-term growth.
-        </p>
-
-        <ul className="space-y-3 text-gray-700">
-          <li>✔ Business formation and registration</li>
-          <li>✔ Legal compliance and filing support</li>
-          <li>✔ Secure document management</li>
-          <li>✔ Expert guidance for entrepreneurs</li>
-        </ul>
-      </div>
-
-      {/* Right Visual Card */}
-      <div className="bg-white rounded-3xl shadow-2xl p-10 border border-gray-100">
-        <p className="text-5xl font-extrabold text-cyan-600 mb-2">
-          500+
-        </p>
-        <p className="text-xl font-semibold text-gray-900 mb-4">
-          Businesses Supported
-        </p>
-        <p className="text-gray-600">
-          Our platform has helped over one million businesses access essential
-          formation and compliance services, making entrepreneurship easier and
-          more accessible worldwide.
-        </p>
-      </div>
-
-    </div>
-
-  </div>
-</section>
-
+      {/* ═══════════════════════════════════════════
+          NEED HELP CTA
+      ═══════════════════════════════════════════ */}
       <section className="pb-20 bg-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-gradient-to-br from-gray-900 to-gray-800 rounded-3xl p-12 text-center text-white">
-            <h2 className="text-4xl font-black mb-6">Need Help Choosing Services?</h2>
+            <h2 className="text-4xl font-black mb-6">
+              Need Help Choosing{' '}
+              <span className="text-cyan-400">Services?</span>
+            </h2>
             <p className="text-xl mb-8 text-gray-300 max-w-2xl mx-auto">
               Our business formation experts can help you identify which services your business needs.
             </p>
-            <button className="inline-block bg-cyan-600 text-white px-12 py-5 rounded-full font-bold text-xl hover:bg-cyan-700 transition-all shadow-2xl">
+            <button
+              onClick={openModal}
+              className="inline-block bg-cyan-600 text-white px-12 py-5 rounded-full font-bold text-xl hover:bg-cyan-700 transition-all shadow-2xl"
+            >
               Talk to an Expert
             </button>
           </div>
         </div>
       </section>
 
+      {/* ═══════════════════════════════════════════
+          WHY CHOOSE US
+      ═══════════════════════════════════════════ */}
       <section className="py-20 bg-cyan-100/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-12">
-            <h2 className="text-5xl font-black text-gray-900 mb-4">Why Choose The Future Perfect Global?</h2>
+            <h2 className="text-5xl font-black text-gray-900 mb-4">
+              Why Choose The Future{' '}
+              <span className="text-cyan-600">Perfect Global?</span>
+            </h2>
           </div>
-
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="text-center">
-              <div className="bg-white rounded-2xl p-8 shadow-lg">
-                <div className="text-5xl mb-4">⚡</div>
-                <h3 className="text-xl font-black text-gray-900 mb-3">Fast Service</h3>
-                <p className="text-gray-700">Same-day filing available</p>
+            {[
+              { icon: '⚡', title: 'Fast Service', desc: 'Same-day filing available' },
+              { icon: '💰', title: 'Transparent Pricing', desc: 'No hidden fees or surprise charges' },
+              { icon: '🛡️', title: 'Expert Support', desc: 'Dedicated support team always ready to help' },
+            ].map(({ icon, title, desc }) => (
+              <div key={title} className="text-center">
+                <div className="bg-white rounded-2xl p-8 shadow-lg">
+                  <div className="text-5xl mb-4">{icon}</div>
+                  <h3 className="text-xl font-black text-gray-900 mb-3">{title}</h3>
+                  <p className="text-gray-700">{desc}</p>
+                </div>
               </div>
-            </div>
-            <div className="text-center">
-              <div className="bg-white rounded-2xl p-8 shadow-lg">
-                <div className="text-5xl mb-4">💰</div>
-                <h3 className="text-xl font-black text-gray-900 mb-3">Transparent Pricing</h3>
-                <p className="text-gray-700">No hidden fees or surprise charges</p>
-              </div>
-            </div>
-            <div className="text-center">
-              <div className="bg-white rounded-2xl p-8 shadow-lg">
-                <div className="text-5xl mb-4">🛡️</div>
-                <h3 className="text-xl font-black text-gray-900 mb-3">Expert Support</h3>
-                <p className="text-gray-700">Dedicated support team always ready to help</p>
-              </div>
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
+      {/* ═══════════════════════════════════════════
+          FAQ
+      ═══════════════════════════════════════════ */}
       <section className="py-20 bg-white">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-16">
-            <h2 className="text-5xl font-black text-gray-900 mb-4">Frequently Asked Questions</h2>
+            <h2 className="text-5xl font-black text-gray-900 mb-4">
+              Frequently Asked{' '}
+              <span className="text-cyan-600">Questions</span>
+            </h2>
             <p className="text-xl text-gray-700">
               Get answers to common questions about essential business services
             </p>
           </div>
-
           <div className="space-y-4">
             {faqs.map((faq, index) => (
               <div key={index} className="bg-cyan-50 rounded-xl shadow-md overflow-hidden border border-cyan-100">
@@ -564,9 +581,7 @@ export default function EssentialServices() {
                 >
                   <span className="font-bold text-gray-900 text-lg pr-8">{faq.question}</span>
                   <svg
-                    className={`w-6 h-6 text-cyan-600 transform transition-transform flex-shrink-0 ${
-                      openFaq === index ? 'rotate-180' : ''
-                    }`}
+                    className={`w-6 h-6 text-cyan-600 transform transition-transform flex-shrink-0 ${openFaq === index ? 'rotate-180' : ''}`}
                     fill="none"
                     stroke="currentColor"
                     viewBox="0 0 24 24"

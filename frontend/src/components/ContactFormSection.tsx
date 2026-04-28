@@ -62,7 +62,7 @@ export default function ContactFormSection() {
       </div>
       <div>
         <div className="font-bold text-gray-900 text-lg">Phone</div>
-        <a href="tel:+858-952-4549" className="text-cyan-600 hover:text-cyan-700 text-xl font-bold">
+        <a href="tel:+858-952-4549" className="text-cyan-600 hover:text-cyan-700 text-base md:text-xl font-bold">
           +858-952-4549
         </a>
         <div className="text-gray-600 text-sm">Mon-Fri, 9am-6pm CST</div>
@@ -71,19 +71,35 @@ export default function ContactFormSection() {
 
     {/* Email */}
     <div className="flex items-start gap-4">
-      <div className="bg-cyan-100 p-4 rounded-xl">
-        <svg className="w-6 h-6 text-cyan-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-        </svg>
-      </div>
-      <div>
-        <div className="font-bold text-gray-900 text-lg">Email</div>
-        <a href="mailto:enquiry@thefutureperfectglobal.us" className="text-cyan-600 hover:text-cyan-700 text-xl font-bold">
-          enquiry@thefutureperfectglobal.us
-        </a>
-        <div className="text-gray-600 text-sm">We respond within 24 hours</div>
-      </div>
-    </div>
+  <div className="bg-cyan-100 p-4 rounded-xl shrink-0">
+    <svg
+      className="w-6 h-6 text-cyan-600"
+      fill="none"
+      stroke="currentColor"
+      viewBox="0 0 24 24"
+    >
+      <path
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        strokeWidth={2}
+        d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
+      />
+    </svg>
+  </div>
+
+  <div className="min-w-0">
+    <div className="font-bold text-gray-900 text-lg">Email</div>
+
+    <a
+      href="mailto:enquiry@thefutureperfectglobal.us"
+      className="text-cyan-600 hover:text-cyan-700 text-base md:text-xl font-bold break-all"
+    >
+      enquiry@thefutureperfectglobal.us
+    </a>
+
+    <div className="text-gray-600 text-sm">We respond within 24 hours</div>
+  </div>
+</div>
 
     {/* Website */}
     <div className="flex items-start gap-4">
@@ -94,7 +110,7 @@ export default function ContactFormSection() {
       </div>
       <div>
         <div className="font-bold text-gray-900 text-lg">Website</div>
-        <a href="https://www.thefutureperfectglobal.us" target="_blank" rel="noopener noreferrer" className="text-cyan-600 hover:text-cyan-700 text-xl font-bold">
+        <a href="https://www.thefutureperfectglobal.us" target="_blank" rel="noopener noreferrer" className="text-cyan-600 hover:text-cyan-700 text-base md:text-xl font-bold">
           www.thefutureperfectglobal.us
         </a>
         <div className="text-gray-600 text-sm">Visit our official website</div>
