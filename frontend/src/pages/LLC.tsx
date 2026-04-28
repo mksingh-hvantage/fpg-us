@@ -83,29 +83,9 @@ const items: Item[] = [
   return display;
 }
 
-// ── Mount-fade hook ──────────────────────────────────────────────────────────
-function useMountFade() {
-  const [ready, setReady] = useState(false);
-  useEffect(() => { const t = setTimeout(() => setReady(true), 60); return () => clearTimeout(t); }, []);
-  return ready;
-}
-
 const TYPEWRITER_WORDS = ["in 2026", "the Right Way", "Without the Hassle", "with Experts"];
 
-interface Props {
-  setSelectedBusinessType: (v: string) => void;
-  setIsModalOpen: (v: boolean) => void;
-  setIsVideoOpen: (v: boolean) => void;
-}
-
   const typed = useTypewriter(TYPEWRITER_WORDS);
-  const ready = useMountFade();
-
-  const fade = (delay = 0) => ({
-    transition: `opacity 0.7s ease ${delay}ms, transform 0.7s ease ${delay}ms`,
-    opacity: ready ? 1 : 0,
-    transform: ready ? "translateY(0)" : "translateY(22px)",
-  });
 
   return (
     <div className="bg-white">
