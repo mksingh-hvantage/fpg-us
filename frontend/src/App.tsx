@@ -399,7 +399,7 @@ function App() {
               <Route path="/virtual-address/business" element={<BusinessVirtualAddress />} />
               <Route path="/virtual-address/personal" element={<PersonalVirtualAddress />} />
               <Route path="/business-management/virtual-mailbox" element={<VirtualMailboxx />} />
-              <Route path="/about" element={<About />} />
+              <Route path="/about" element={<About />} /> 
               <Route path="/help-center" element={<HelpCenter />} />
               <Route path="/business-name-generator" element={<BusinessNameGenerator />} />
               <Route path="/articles" element={<Articles />} />
