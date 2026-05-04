@@ -443,7 +443,7 @@ function App() {
               <Route path="/reviews" element={<About />} />
               <Route path="/blog" element={<Articles />} />
               <Route path="/careers" element={<Careers />} />
-              <Route path="/privacy-policy" element={<Privacy />} />
+              <Route path="/privacy-policy" element={<Privacy />} /> 
               <Route path="/disclaimer" element={<Disclaimer />} />
               <Route path="/terms" element={<Disclaimer />} />
               <Route path="/cancellation-policy" element={<CancellationPolicy />} />
