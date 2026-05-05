@@ -5,22 +5,6 @@ import GetStartedModal from '../components/GetStartedModal';
 import { ChevronDown, ChevronRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
-// ── Utility: wraps last two words in cyan span ──
-function cyanLast2(text: string) {
-  const words = text.trim().split(' ');
-  if (words.length <= 2) {
-    return <span className="text-cyan-600">{text}</span>;
-  }
-  const main = words.slice(0, -2).join(' ');
-  const last2 = words.slice(-2).join(' ');
-  return (
-    <>
-      {main}{' '}
-      <span className="text-cyan-600">{last2}</span>
-    </>
-  );
-}
-
 export default function States() {
   const [search, setSearch] = useState('');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
