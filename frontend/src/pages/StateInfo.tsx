@@ -361,65 +361,188 @@ export default function States() {
       </section>
 
       {/* ════════════════════════════════════════
-          STATE GRID SECTION
-      ════════════════════════════════════════ */}
-      <section id="state-grid" className="py-24 bg-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-3xl mb-10">
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900 mb-3">
-              {cyanLast2('Select Your State')}
-            </h2>
-            <p className="text-slate-600 text-lg">
-              Compare LLC filing fees, annual costs, and requirements for every U.S. state.
-            </p>
-            <div className="mt-0 h-1 w-24 bg-bizee-cyan rounded-full"></div>
-            <div className="mt-8">
-              <input
-                type="text"
-                placeholder="Search your state..."
-                value={search}
-                onChange={(e) => setSearch(e.target.value)}
-                className="w-full px-5 py-3 rounded-xl border border-gray-200
-                  focus:outline-none focus:ring-2 focus:ring-bizee-cyan
-                  focus:border-transparent text-slate-700 shadow-sm"
-              />
-            </div>
-          </div>
+    STATE GRID SECTION — Mosaic Tile Design
+════════════════════════════════════════ */}
+<section id="state-grid" className="py-24 bg-[#f8fafc]">
+  <style>{`
+    .state-tile {
+      position: relative;
+      background: #fff;
+      border-radius: 20px;
+      border: 1.5px solid #e2e8f0;
+      padding: 22px 18px 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      cursor: pointer;
+      transition: all 0.28s cubic-bezier(0.22,1,0.36,1);
+      overflow: hidden;
+    }
+    .state-tile::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, #ecfeff 0%, #fff 60%);
+      opacity: 0;
+      transition: opacity 0.3s;
+      border-radius: 20px;
+    }
+    .state-tile:hover {
+      transform: translateY(-5px) scale(1.025);
+      border-color: #06b6d4;
+      box-shadow: 0 16px 40px rgba(6,182,212,0.15), 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .state-tile:hover::before { opacity: 1; }
+    .state-tile:hover .tile-arrow { opacity: 1; transform: translate(0,0); }
+    .state-tile:hover .tile-abbr { color: #0891b2; }
+    .tile-arrow {
+      opacity: 0;
+      transform: translate(-4px, 4px);
+      transition: all 0.25s ease;
+    }
+    .tile-fee-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      background: #f0fdfa;
+      border: 1px solid #99f6e4;
+      color: #0f766e;
+      font-size: 11px;
+      font-weight: 700;
+      padding: 3px 9px;
+      border-radius: 99px;
+      width: fit-content;
+    }
+    .tile-popular {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: linear-gradient(135deg, #0891b2, #06b6d4);
+      color: #fff;
+      font-size: 9px;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      padding: 3px 8px;
+      border-radius: 99px;
+    }
+    .search-input-wrap {
+      position: relative;
+    }
+    .search-input-wrap svg {
+      position: absolute;
+      left: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #94a3b8;
+      pointer-events: none;
+    }
+    .search-input-wrap input {
+      padding-left: 44px !important;
+    }
+    @keyframes tileIn {
+      from { opacity: 0; transform: translateY(18px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+    .tile-animate {
+      animation: tileIn 0.4s cubic-bezier(0.22,1,0.36,1) both;
+    }
+  `}</style>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {filteredStates.map((state) => (
-              <Link
-                key={state.slug}
-                to={`/state-llc-formation/${state.slug}`}
-                className="group relative bg-white p-7 rounded-3xl
-                  border border-gray-100 shadow-sm
-                  hover:shadow-2xl hover:border-bizee-cyan/30
-                  transition-all duration-300 ease-out
-                  hover:-translate-y-1"
-              >
-                <div className="flex items-start justify-between mb-1">
-                  <h3 className="text-xl font-bold text-bizee-cyan transition-colors">{state.name}</h3>
-                  <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-bizee-cyan transform group-hover:translate-x-1 transition-all" />
-                </div>
-                <div className="space-y-4 pt-4 border-t border-gray-100">
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs uppercase tracking-widest text-slate-400 font-medium">Filing Fee</span>
-                    <span className="text-sm font-semibold text-slate-700">{state.filingFee}</span>
-                  </div>
-                  <div className="flex justify-between items-center">
-                    <span className="text-xs uppercase tracking-widest text-slate-400 font-medium">Annual Fee</span>
-                    <span className="text-sm font-semibold text-slate-700">{state.annualReportFee}</span>
-                  </div>
-                </div>
-                <div className="mt-6 text-sm font-semibold text-bizee-cyan group-hover:opacity-100 transition-opacity">
-                  View state details →
-                </div>
-                <div className="absolute inset-0 rounded-3xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity bg-gradient-to-br from-bizee-cyan/5 via-transparent to-transparent"></div>
-              </Link>
-            ))}
-          </div>
+  <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+
+    {/* Section Header */}
+    <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-10">
+      <div>
+        <div className="inline-flex items-center gap-2 bg-cyan-100 text-cyan-700 text-xs font-bold uppercase tracking-widest px-4 py-1.5 rounded-full mb-3">
+          <span className="w-1.5 h-1.5 rounded-full bg-cyan-500 inline-block"></span>
+          All 50 States
         </div>
-      </section>
+        <h2 className="text-3xl sm:text-4xl font-extrabold text-slate-900">
+          Browse LLC Info <span className="text-cyan-600">by State</span>
+        </h2>
+        <p className="text-slate-500 mt-2 text-base">Click any state to view fees, timelines &amp; requirements.</p>
+      </div>
+
+      {/* Search */}
+      <div className="search-input-wrap w-full sm:w-72">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2">
+          <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
+        </svg>
+        <input
+          type="text"
+          placeholder="Search state..."
+          value={search}
+          onChange={(e) => setSearch(e.target.value)}
+          className="w-full px-5 py-3 rounded-xl border border-gray-200
+            focus:outline-none focus:ring-2 focus:ring-cyan-400
+            focus:border-transparent text-slate-700 shadow-sm text-sm"
+        />
+      </div>
+    </div>
+
+    {/* Count */}
+    <p className="text-xs text-slate-400 font-medium mb-6">
+      Showing <span className="text-cyan-600 font-bold">{filteredStates.length}</span> of 50 states
+    </p>
+
+    {/* Grid */}
+    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-4">
+      {filteredStates.map((state, i) => {
+        const popularStates = ['Wyoming', 'Delaware', 'Nevada', 'Florida', 'Texas'];
+        const isPopular = popularStates.includes(state.name);
+        return (
+          <Link
+            key={state.slug}
+            to={`/state-llc-formation/${state.slug}`}
+            className="state-tile tile-animate"
+            style={{ animationDelay: `${Math.min(i * 0.04, 0.8)}s` }}
+          >
+            {isPopular && <span className="tile-popular">⭐ Popular</span>}
+
+            {/* Abbreviation */}
+            <div className="tile-abbr text-2xl font-black text-slate-200 tracking-tight transition-colors leading-none">
+              {state.name.substring(0, 2).toUpperCase()}
+            </div>
+
+            {/* State Name */}
+            <h3 className="relative z-10 text-sm font-bold text-slate-800 leading-tight mt-1">
+              {state.name}
+            </h3>
+
+            {/* Filing Fee badge */}
+            <div className="tile-fee-badge relative z-10">
+              <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3">
+                <path d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+              </svg>
+              {state.filingFee}
+            </div>
+
+            {/* Annual fee */}
+            <div className="relative z-10 text-[11px] text-slate-400 font-medium flex items-center gap-1 mt-0.5">
+              <span>Annual:</span>
+              <span className="text-slate-600 font-semibold">{state.annualReportFee}</span>
+            </div>
+
+            {/* Arrow */}
+            <div className="tile-arrow relative z-10 mt-1 text-cyan-500">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <path d="M7 17 17 7M7 7h10v10"/>
+              </svg>
+            </div>
+          </Link>
+        );
+      })}
+    </div>
+
+    {filteredStates.length === 0 && (
+      <div className="text-center py-20 text-slate-400">
+        <div className="text-5xl mb-4">🔍</div>
+        <p className="font-semibold text-lg">No states found for "<span className="text-cyan-600">{search}</span>"</p>
+      </div>
+    )}
+  </div>
+</section>
 
       {/* ════════════════════════════════════════
           BEST STATE SECTION
