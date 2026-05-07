@@ -19,28 +19,13 @@ function ColorLastTwo({ text }: { text: string }) {
 }
 
 // Animated counter hook
-function useCountUp(end: number, duration = 2000, start = false) {
-  const [count, setCount] = useState(0);
-  useEffect(() => {
-    if (!start) return;
-    let startTime: number;
-    const step = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / duration, 1);
-      setCount(Math.floor(progress * end));
-      if (progress < 1) requestAnimationFrame(step);
-    };
-    requestAnimationFrame(step);
-  }, [end, duration, start]);
-  return count;
-}
 
 export default function BookkeepingConsultation() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBusinessType, setSelectedBusinessType] = useState<string>('');
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [heroVisible, setHeroVisible] = useState(false);
-  const [statsVisible, setStatsVisible] = useState(false);
+  const [, setStatsVisible] = useState(false);
   const statsRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -57,10 +42,6 @@ export default function BookkeepingConsultation() {
     setOpenFaq(openFaq === index ? null : index);
   };
 
-  const stat1 = useCountUp(100000, 2200, statsVisible);
-  const stat2 = useCountUp(500, 2000, statsVisible);
-  const stat3 = useCountUp(30, 1800, statsVisible);
-  const stat4 = useCountUp(98, 2000, statsVisible);
 
   const steps = [
     { id: 1, title: "Book Your Free Tax Consultation", description: "Start with a quick consultation with experienced tax professionals and discover opportunities to reduce your tax burden." },

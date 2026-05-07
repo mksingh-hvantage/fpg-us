@@ -2,7 +2,6 @@ import { Link } from 'react-router-dom';
 import { states } from '../data/states';
 import GetStartedModal from '../components/GetStartedModal';
 import { Helmet } from "react-helmet-async";
-import { ChevronRight } from 'lucide-react';
 import { useState, useEffect } from 'react';
 
 // ── Utility: wraps last two words of a string in a cyan span ──

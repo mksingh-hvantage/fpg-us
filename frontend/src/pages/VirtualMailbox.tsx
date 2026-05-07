@@ -1,6 +1,6 @@
 import { useParams } from "react-router-dom";
 import { states } from "../data/states";
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import { Helmet } from "react-helmet-async";
 import GetStartedModal from '../components/GetStartedModal';
 import {

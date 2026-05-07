@@ -69,7 +69,7 @@ function Particles() {
 }
 
 export default function Dissolution() {
-  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [, setIsModalOpen] = useState(false);
   const [heroVisible, setHeroVisible] = useState(false);
   const statsRef = useInView();
   const count500 = useCountUp(500, 1600, statsRef.inView);

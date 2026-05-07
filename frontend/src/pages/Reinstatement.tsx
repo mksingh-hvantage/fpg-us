@@ -1,4 +1,4 @@
-import { useState, useEffect, useRef } from 'react';
+import { useState } from 'react';
 import GetStartedModal from '../components/GetStartedModal';
 import { Helmet } from "react-helmet-async";
 import { CheckCircle, Clock, Shield, FileText, XCircle, Award, ArrowRight, Star, Zap, RefreshCw } from 'lucide-react';
@@ -135,39 +135,12 @@ function ColorHeading({ text, words = 2, className = '' }: { text: string; words
 /* ─────────────────────────────────────────────
    Animated counter
 ───────────────────────────────────────────── */
-function Counter({ end, suffix = '', prefix = '' }: { end: number; suffix?: string; prefix?: string }) {
-  const [count, setCount] = useState(0);
-  const ref = useRef<HTMLSpanElement>(null);
-  useEffect(() => {
-    const observer = new IntersectionObserver(([e]) => {
-      if (e.isIntersecting) {
-        let n = 0;
-        const step = Math.ceil(end / 50);
-        const t = setInterval(() => {
-          n += step;
-          if (n >= end) { setCount(end); clearInterval(t); }
-          else setCount(n);
-        }, 28);
-        observer.disconnect();
-      }
-    }, { threshold: .5 });
-    if (ref.current) observer.observe(ref.current);
-    return () => observer.disconnect();
-  }, [end]);
-  return <span ref={ref}>{prefix}{count}{suffix}</span>;
-}
 
 export default function Reinstatement() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBusinessType, setSelectedBusinessType] = useState<string>('');
   const openModal = () => { setSelectedBusinessType(''); setIsModalOpen(true); };
 
-  const stats = [
-    { end: 100000, suffix: '+', prefix: '',  label: 'Businesses Served' },
-    { end: 50,     suffix: '',  prefix: '',  label: 'States Covered'    },
-    { end: 2,      suffix: '',  prefix: '',  label: 'Avg. Days to File' },
-    { end: 7,      suffix: '+', prefix: '',  label: 'Years Experience'  },
-  ];
 
   const reasons = [
     { color: 'blue',   icon: <Clock   className="w-8 h-8 text-white" />, bg: 'bg-blue-600',   border: 'border-blue-200',   from: 'from-blue-50',   to: 'to-blue-100',   title: 'Faster Recovery',       desc: 'In many states, reinstatement procedures can be completed in less time than forming a new company. Get back to business quickly without lengthy formation delays.' },
