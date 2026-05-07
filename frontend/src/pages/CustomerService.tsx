@@ -3,316 +3,545 @@ import {
   Cloud,
   CheckCircle2,
   ArrowRight,
-  ChevronDown
+  ChevronDown,
+  Phone,
+  Mail,
+  MessageSquare,
+  HeadphonesIcon,
+  TrendingUp,
+  Users,
+  Zap,
+  Shield,
 } from "lucide-react";
-import { useState } from 'react';
+import { useState, useEffect, useRef, type JSX } from 'react';
+
+// Colors last two words with text-cyan-600 — no tag changes
+function ColoredHeading({
+  text,
+  tag = 'h2',
+  className = '',
+}: {
+  text: string;
+  tag?: string;
+  className?: string;
+}) {
+  const words = text.trim().split(' ');
+  const lastTwo = words.slice(-2).join(' ');
+  const rest = words.slice(0, -2).join(' ');
+  const Tag = tag as keyof JSX.IntrinsicElements;
+  return (
+    <Tag className={className}>
+      {rest}{rest ? ' ' : ''}
+      <span className="text-cyan-600">{lastTwo}</span>
+    </Tag>
+  );
+}
+
+function useCountUp(target: number, duration = 1600, active = false) {
+  const [count, setCount] = useState(0);
+  useEffect(() => {
+    if (!active) return;
+    let start: number | null = null;
+    const tick = (ts: number) => {
+      if (!start) start = ts;
+      const p = Math.min((ts - start) / duration, 1);
+      setCount(Math.floor(p * target));
+      if (p < 1) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
+  }, [target, duration, active]);
+  return count;
+}
+
+function useInView(threshold = 0.15) {
+  const ref = useRef<HTMLDivElement>(null);
+  const [inView, setInView] = useState(false);
+  useEffect(() => {
+    const obs = new IntersectionObserver(
+      ([e]) => { if (e.isIntersecting) { setInView(true); obs.disconnect(); } },
+      { threshold }
+    );
+    if (ref.current) obs.observe(ref.current);
+    return () => obs.disconnect();
+  }, []);
+  return { ref, inView };
+}
 
 export default function CustomerService() {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedBusinessType, setSelectedBusinessType] = useState<string>('');
+  const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const [heroVisible, setHeroVisible] = useState(false);
+  const statsRef = useInView();
 
-const [isModalOpen, setIsModalOpen] = useState(false);
-const [selectedBusinessType, setSelectedBusinessType] = useState<string>('');
-const [openIndex, setOpenIndex] = useState<number | null>(null);
+  const satisfaction = useCountUp(98,   1800, statsRef.inView);
+  const agents       = useCountUp(500,  1800, statsRef.inView);
+  const response     = useCountUp(30,   1800, statsRef.inView);
+  const clients      = useCountUp(800,  1800, statsRef.inView);
 
-// Content
-const challenges = [
-  "Inconsistent customer support quality across multiple channels.",
-  "High response and resolution time impacting customer satisfaction.",
-  "Difficulty managing 24/7 customer support operations in-house.",
-  "Lack of skilled agents to handle complex customer queries.",
-  "Increasing operational costs for in-house support teams.",
-];
+  useEffect(() => {
+    const t = setTimeout(() => setHeroVisible(true), 80);
+    return () => clearTimeout(t);
+  }, []);
 
-const services = [
-  "24/7 omnichannel customer support (call, email, chat, social media).",
-  "Inbound & outbound call center services.",
-  "Technical support and helpdesk management.",
-  "Complaint resolution and escalation handling.",
-  "CRM management and customer data processing.",
-  "Order processing, tracking, and after-sales support.",
-];
+  const challenges = [
+    "Inconsistent customer support quality across multiple channels.",
+    "High response and resolution time impacting customer satisfaction.",
+    "Difficulty managing 24/7 customer support operations in-house.",
+    "Lack of skilled agents to handle complex customer queries.",
+    "Increasing operational costs for in-house support teams.",
+  ];
 
-const benefits = [
-  "Improved customer satisfaction and brand loyalty",
-  "24/7 customer support availability",
-  "Reduced operational and staffing costs",
-  "Access to trained and experienced agents",
-  "Faster response and resolution time",
-  "Scalable operations during peak demand",
-];
+  const services = [
+    { icon: HeadphonesIcon, text: "24/7 omnichannel customer support (call, email, chat, social media)." },
+    { icon: Phone,          text: "Inbound & outbound call center services." },
+    { icon: Zap,            text: "Technical support and helpdesk management." },
+    { icon: MessageSquare,  text: "Complaint resolution and escalation handling." },
+    { icon: Users,          text: "CRM management and customer data processing." },
+    { icon: Mail,           text: "Order processing, tracking, and after-sales support." },
+  ];
 
-const faqs = [
-{
-q: "What is customer service outsourcing?",
-a: "Customer service outsourcing is the practice of delegating customer support operations such as calls, emails, live chat, and helpdesk services to a third-party provider. It helps businesses deliver consistent, professional, and efficient customer experiences."
-},
-{
-q: "Why should businesses outsource customer support?",
-a: "Outsourcing helps businesses reduce operational costs, ensure 24/7 support, improve response times, and access trained professionals. It allows companies to focus on core business activities while improving customer satisfaction."
-},
-{
-q: "Which industries benefit from customer support outsourcing?",
-a: "Industries like eCommerce, SaaS, healthcare, fintech, telecom, and retail benefit the most. Any business with high customer interaction can improve efficiency and service quality through outsourcing."
-},
-{
-q: "What channels are included in customer support services?",
-a: "Customer support includes phone support, email support, live chat, social media management, and helpdesk services. Omnichannel support ensures customers can connect through their preferred platforms."
-},
-{
-q: "Is customer service outsourcing secure?",
-a: "Yes, outsourcing providers use secure cloud systems, data encryption, and strict compliance standards to ensure data privacy and protection."
-},
-{
-q: "How does outsourcing improve customer satisfaction?",
-a: "Outsourcing provides faster response times, professional communication, and 24/7 availability. This leads to better customer experiences, higher retention, and improved brand reputation."
-},
-{
-q: "Can outsourced teams handle high customer volume?",
-a: "Yes, outsourcing providers offer scalable solutions that easily handle peak seasons, sales spikes, and growing customer demand without compromising quality."
-},
-{
-q: "How cost-effective is customer support outsourcing?",
-a: "It eliminates hiring, training, and infrastructure costs, converting fixed expenses into flexible operational costs, making it highly cost-efficient."
-}
-];
+  const benefits = [
+    { icon: TrendingUp,     title: "Higher Satisfaction",     desc: "Professional agents trained to resolve issues quickly and leave every customer feeling valued." },
+    { icon: HeadphonesIcon, title: "24/7 Availability",       desc: "Round-the-clock support coverage across all time zones — no gaps, no missed customers." },
+    { icon: Shield,         title: "Reduced Costs",           desc: "Eliminate hiring, training, and infrastructure overhead with a flexible outsourcing model." },
+    { icon: Users,          title: "Expert Agent Access",     desc: "Immediately tap into a pool of trained, experienced support professionals." },
+    { icon: Zap,            title: "Faster Resolution",       desc: "Streamlined workflows and smart escalation paths that cut handle time significantly." },
+    { icon: Cloud,          title: "Elastic Scalability",     desc: "Seamlessly scale agent capacity up or down to match seasonal demand spikes." },
+  ];
 
-return (
-<div className="bg-white text-slate-800">
+  const faqs = [
+    { q: "What is customer service outsourcing?",             a: "Customer service outsourcing is the practice of delegating customer support operations such as calls, emails, live chat, and helpdesk services to a third-party provider. It helps businesses deliver consistent, professional, and efficient customer experiences." },
+    { q: "Why should businesses outsource customer support?", a: "Outsourcing helps businesses reduce operational costs, ensure 24/7 support, improve response times, and access trained professionals. It allows companies to focus on core business activities while improving customer satisfaction." },
+    { q: "Which industries benefit from customer support outsourcing?", a: "Industries like eCommerce, SaaS, healthcare, fintech, telecom, and retail benefit the most. Any business with high customer interaction can improve efficiency and service quality through outsourcing." },
+    { q: "What channels are included in customer support services?", a: "Customer support includes phone support, email support, live chat, social media management, and helpdesk services. Omnichannel support ensures customers can connect through their preferred platforms." },
+    { q: "Is customer service outsourcing secure?",           a: "Yes, outsourcing providers use secure cloud systems, data encryption, and strict compliance standards to ensure data privacy and protection." },
+    { q: "How does outsourcing improve customer satisfaction?", a: "Outsourcing provides faster response times, professional communication, and 24/7 availability. This leads to better customer experiences, higher retention, and improved brand reputation." },
+    { q: "Can outsourced teams handle high customer volume?",  a: "Yes, outsourcing providers offer scalable solutions that easily handle peak seasons, sales spikes, and growing customer demand without compromising quality." },
+    { q: "How cost-effective is customer support outsourcing?", a: "It eliminates hiring, training, and infrastructure costs, converting fixed expenses into flexible operational costs, making it highly cost-efficient." },
+  ];
 
-{/* HERO */}
-<section className="relative bg-gradient-to-br from-slate-950 via-slate-900 to-cyan-950 text-white">
-<div className="mx-auto max-w-7xl px-4 py-12 grid lg:grid-cols-2 gap-12 items-center">
+  const channels = ['Phone', 'Live Chat', 'Email', 'Social Media', 'Helpdesk', 'WhatsApp'];
 
-<div>
+  return (
+    <div className="bg-white text-slate-800 overflow-x-hidden">
 
-<span className="inline-flex items-center rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm text-slate-200">
-<Cloud className="mr-2 h-4 w-4" />
-Customer Service Outsourcing Solutions
-</span>
+      {/* ── HERO ── */}
+      <section className="relative min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-cyan-950 text-white flex items-center overflow-hidden">
 
-<h1 className="mt-6 text-4xl font-extrabold leading-tight">
-Customer Support Outsourcing Services
-</h1>
+        {/* Animated grid */}
+        <div
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage:
+              'linear-gradient(rgba(6,182,212,0.3) 1px, transparent 1px), linear-gradient(90deg, rgba(6,182,212,0.3) 1px, transparent 1px)',
+            backgroundSize: '60px 60px',
+          }}
+        />
 
-<p className="mt-6 text-lg text-slate-300">
-Deliver exceptional customer experiences with professional outsourcing solutions tailored for modern businesses.
-</p>
+        {/* Ambient blobs */}
+        <div className="absolute top-20  right-16 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl animate-pulse" />
+        <div className="absolute bottom-24 left-8  w-96 h-96 bg-slate-600/20 rounded-full blur-3xl animate-pulse" style={{ animationDelay: '1.2s' }} />
+        <div className="absolute top-1/2  left-1/3 w-64 h-64 bg-cyan-400/5  rounded-full blur-2xl animate-pulse" style={{ animationDelay: '2.5s' }} />
 
-<p className="mt-4 text-base text-slate-400 max-w-xl">
-Our customer service outsourcing solutions help businesses manage customer interactions, improve response time, and maintain high-quality support while reducing operational costs.
-</p>
+        {/* Orbiting decoration */}
+        <div className="absolute right-0 top-1/2 -translate-y-1/2 w-[680px] h-[680px] pointer-events-none hidden lg:block">
+          <div className="absolute inset-0  rounded-full border border-cyan-500/10 animate-spin" style={{ animationDuration: '35s' }} />
+          <div className="absolute inset-12 rounded-full border border-cyan-400/10 animate-spin" style={{ animationDuration: '22s', animationDirection: 'reverse' }} />
+          <div className="absolute inset-24 rounded-full border border-slate-400/10 animate-spin" style={{ animationDuration: '16s' }} />
+          {['24/7 Coverage', 'Omnichannel', 'CSAT 98%', 'CRM Ready', 'Fast Escalation', 'ISO Secure'].map((label, i) => {
+            const r = 295;
+            const rad = ((i * 60) * Math.PI) / 180;
+            return (
+              <div
+                key={label}
+                className="absolute -translate-x-1/2 -translate-y-1/2 bg-white/5 backdrop-blur border border-white/10 rounded-full px-3 py-1 text-xs text-cyan-300 whitespace-nowrap"
+                style={{ left: 340 + r * Math.cos(rad), top: 340 + r * Math.sin(rad) }}
+              >
+                {label}
+              </div>
+            );
+          })}
+        </div>
 
-<div className="mt-8 flex flex-wrap gap-4">
+        <div className="relative mx-auto max-w-7xl px-4 py-16 grid lg:grid-cols-2 gap-16 items-center w-full">
 
-<button
-onClick={() => {
-setSelectedBusinessType('');
-setIsModalOpen(true);
-}}
-className="bg-cyan-400 px-6 py-3 rounded-xl text-slate-900 font-semibold hover:bg-cyan-300 transition"
->
-Get Started <ArrowRight className="inline ml-2 h-4 w-4"/>
-</button>
+          {/* Left — copy */}
+          <div>
+            <span
+              className={`inline-flex items-center rounded-full border border-cyan-400/30 bg-cyan-400/10 px-4 py-2 text-sm text-cyan-300 mb-6 transition-all duration-700 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+            >
+              <Cloud className="mr-2 h-4 w-4" />
+              Customer Service Outsourcing Solutions
+            </span>
 
-<a
-href="#services"
-className="border border-white/20 px-6 py-3 rounded-xl text-white hover:bg-white/10 transition"
->
-Explore Services
-</a>
+            <h1
+              className={`text-5xl lg:text-6xl font-extrabold leading-tight transition-all duration-700 delay-100 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+            >
+              Customer Support that{' '}
+              <span className="relative inline-block">
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-cyan-300 to-cyan-500">
+                  Builds Loyalty
+                </span>
+                <span className="absolute -bottom-1 left-0 right-0 h-px bg-gradient-to-r from-cyan-400/0 via-cyan-400/80 to-cyan-400/0" />
+              </span>
+            </h1>
 
-</div>
+            <p
+              className={`mt-6 text-lg text-slate-300 max-w-xl leading-relaxed transition-all duration-700 delay-200 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+            >
+              Deliver exceptional customer experiences with professional outsourcing solutions tailored for modern businesses — available 24/7 across every channel.
+            </p>
 
-</div>
+            <p
+              className={`mt-4 text-base text-slate-400 max-w-xl transition-all duration-700 delay-300 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+            >
+              Our customer service outsourcing solutions help businesses manage customer interactions, improve response time, and maintain high-quality support while reducing operational costs.
+            </p>
 
-<div>
-<img
-src="https://images.unsplash.com/photo-1552664730-d307ca884978"
-alt="Customer Support"
-className="rounded-3xl shadow-2xl"
-/>
-</div>
+            <div
+              className={`mt-10 flex flex-wrap gap-4 transition-all duration-700 delay-500 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+            >
+              <button
+                onClick={() => { setSelectedBusinessType(''); setIsModalOpen(true); }}
+                className="group relative bg-cyan-500 hover:bg-cyan-400 px-8 py-4 rounded-2xl text-slate-900 font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl hover:shadow-cyan-500/30 flex items-center gap-2 overflow-hidden"
+              >
+                <span className="relative z-10">Get Started</span>
+                <ArrowRight className="relative z-10 h-4 w-4 group-hover:translate-x-1 transition-transform" />
+                <span className="absolute inset-0 bg-gradient-to-r from-cyan-400 to-cyan-300 opacity-0 group-hover:opacity-100 transition-opacity" />
+              </button>
 
-</div>
-</section>
+              <a
+                href="#services"
+                className="border border-white/20 hover:border-cyan-400/50 px-8 py-4 rounded-2xl text-white hover:bg-cyan-400/10 hover:text-cyan-300 transition-all duration-300 font-semibold"
+              >
+                Explore Services
+              </a>
+            </div>
 
-{/* INTRO */}
-<section className="mx-auto max-w-7xl px-4 py-16 grid lg:grid-cols-2 gap-12 items-center">
+            {/* Channel badges */}
+            <div
+              className={`mt-10 transition-all duration-700 delay-700 ${heroVisible ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-6'}`}
+            >
+              <p className="text-xs text-slate-500 uppercase tracking-widest mb-3">Channels We Cover</p>
+              <div className="flex flex-wrap gap-2">
+                {channels.map(c => (
+                  <span key={c} className="px-3 py-1.5 rounded-lg bg-white/5 border border-white/10 text-sm text-slate-300 hover:border-cyan-400/40 hover:text-cyan-300 transition-colors">
+                    {c}
+                  </span>
+                ))}
+              </div>
+            </div>
+          </div>
 
-<div>
-<img
-src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d"
-className="rounded-3xl shadow-lg"
-/>
-</div>
+          {/* Right — image + floating chips */}
+          <div
+            className={`relative hidden lg:block transition-all duration-1000 delay-300 ${heroVisible ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}
+          >
+            <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-black/50 ring-1 ring-white/10">
+              <img
+                src="https://images.unsplash.com/photo-1552664730-d307ca884978"
+                alt="Customer Support"
+                className="w-full object-cover h-[480px]"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-900/60 via-transparent to-transparent" />
+            </div>
 
-<div>
+            <div className="absolute -top-4 -left-6 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-4 shadow-xl animate-bounce" style={{ animationDuration: '3s' }}>
+              <p className="text-xs text-slate-300">Customer Satisfaction</p>
+              <p className="text-2xl font-extrabold text-cyan-400">98%</p>
+            </div>
 
-<h2 className="mt-6 text-3xl font-extrabold">
-End-to-End Customer Support Outsourcing Solutions
-</h2>
+            <div className="absolute -bottom-4 -right-6 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl p-4 shadow-xl animate-bounce" style={{ animationDuration: '4s', animationDelay: '1s' }}>
+              <p className="text-xs text-slate-300">Avg. Response Time</p>
+              <p className="text-2xl font-extrabold text-cyan-400">&lt;30s</p>
+            </div>
 
-<p className="mt-6 text-base text-slate-600">
-Customer service outsourcing enables businesses to deliver seamless support without managing in-house teams.
-</p>
+            <div className="absolute top-1/2 -right-8 bg-slate-900/80 backdrop-blur-xl border border-white/10 rounded-2xl p-3 shadow-xl">
+              <div className="flex items-center gap-2">
+                <div className="h-2.5 w-2.5 rounded-full bg-green-400 animate-pulse" />
+                <p className="text-xs text-white font-semibold">Agents Online</p>
+              </div>
+            </div>
+          </div>
+        </div>
 
-<p className="mt-4 text-base text-slate-600">
-From handling queries to resolving complaints, our services ensure faster resolution, better engagement, and improved customer satisfaction.
-</p>
+        {/* Scroll cue */}
+        <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 opacity-40">
+          <span className="text-xs text-white uppercase tracking-widest">Scroll</span>
+          <div className="w-px h-8 bg-gradient-to-b from-white to-transparent animate-pulse" />
+        </div>
+      </section>
 
-<div className="mt-6 space-y-3">
+      {/* ── STATS STRIP ── */}
+      <section className="bg-gradient-to-r from-cyan-600 to-cyan-700 text-white py-10">
+        <div ref={statsRef.ref} className="max-w-7xl mx-auto px-4 grid grid-cols-2 lg:grid-cols-4 gap-8 text-center">
+          {[
+            { value: `${satisfaction}%`, label: 'Customer Satisfaction' },
+            { value: `${agents}+`,       label: 'Trained Agents' },
+            { value: `<${response}s`,    label: 'Avg. Response Time' },
+            { value: `${clients}+`,      label: 'Clients Served' },
+          ].map((s, i) => (
+            <div key={i} className="flex flex-col items-center">
+              <span className="text-5xl font-extrabold">{s.value}</span>
+              <span className="mt-1 text-cyan-100 text-sm">{s.label}</span>
+            </div>
+          ))}
+        </div>
+      </section>
 
-{[
-"Omnichannel support (call, chat, email)",
-"Experienced and trained support agents",
-"Advanced CRM integration",
-"Scalable support infrastructure"
-].map((item, i) => (
-<div key={i} className="flex items-start gap-3">
-<CheckCircle2 className="mt-1 h-5 w-5 text-cyan-600" />
-<p className="text-slate-700">{item}</p>
-</div>
-))}
+      {/* ── INTRO ── */}
+      <section className="mx-auto max-w-7xl px-4 py-20 grid lg:grid-cols-2 gap-16 items-center">
+        <div className="relative">
+          <img
+            src="https://images.unsplash.com/photo-1521737604893-d14cc237f11d"
+            className="rounded-3xl shadow-xl object-cover h-[460px] w-full"
+            alt="Support team"
+          />
+          <div className="absolute inset-0 rounded-3xl ring-1 ring-slate-200/60" />
+          <div className="absolute -bottom-4 -right-4 w-24 h-24 bg-cyan-100 rounded-2xl -z-10" />
+          <div className="absolute -top-4  -left-4  w-16 h-16 bg-slate-100 rounded-2xl -z-10" />
+        </div>
 
-</div>
+        <div>
+          <span className="inline-block text-xs font-semibold uppercase tracking-widest text-cyan-600 mb-4">Why Outsource?</span>
+          <ColoredHeading
+            text="End-to-End Customer Support Outsourcing Solutions"
+            className="text-3xl font-extrabold leading-snug"
+          />
 
-</div>
+          <p className="mt-6 text-base text-slate-600 leading-relaxed">
+            Customer service outsourcing enables businesses to deliver seamless support without managing in-house teams — giving you more time to focus on what matters most.
+          </p>
+          <p className="mt-4 text-base text-slate-600 leading-relaxed">
+            From handling queries to resolving complaints, our services ensure faster resolution, better engagement, and improved customer satisfaction at every touchpoint.
+          </p>
 
-</section>
+          <div className="mt-8 grid grid-cols-1 gap-3">
+            {[
+              "Omnichannel support (call, chat, email)",
+              "Experienced and trained support agents",
+              "Advanced CRM integration",
+              "Scalable support infrastructure",
+            ].map((item, i) => (
+              <div key={i} className="flex items-center gap-3 p-3 rounded-xl hover:bg-cyan-50 transition-colors group">
+                <div className="h-8 w-8 rounded-lg bg-cyan-100 flex items-center justify-center group-hover:bg-cyan-200 transition-colors shrink-0">
+                  <CheckCircle2 className="h-4 w-4 text-cyan-600" />
+                </div>
+                <p className="text-slate-700 font-medium">{item}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-{/* CHALLENGES + SERVICES */}
-<section id="services" className="bg-cyan-100/40 py-16">
-<div className="max-w-7xl mx-auto px-4 grid lg:grid-cols-2 gap-10">
+      {/* ── CHALLENGES + SERVICES ── */}
+      <section id="services" className="py-20 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-14">
+            <span className="inline-block text-xs font-semibold uppercase tracking-widest text-cyan-600 mb-3">What We Address</span>
+            <ColoredHeading
+              text="Challenges We Solve, Services We Deliver"
+              className="text-5xl font-extrabold"
+            />
+          </div>
 
-<div className="bg-white p-8 rounded-3xl shadow">
-<h3 className="text-2xl font-extrabold mb-6">Challenges</h3>
-{challenges.map((item, i) => (
-<div key={i} className="flex gap-3 mb-4">
-<CheckCircle2 className="text-red-500"/>
-<p>{item}</p>
-</div>
-))}
-</div>
+          <div className="grid lg:grid-cols-2 gap-8">
+            {/* Challenges */}
+            <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+              <div className="bg-red-50 px-8 py-5 border-b border-red-100">
+                <h3 className="text-xl font-extrabold text-slate-800">Common Challenges</h3>
+                <p className="text-sm text-slate-500 mt-1">Pain points we eliminate</p>
+              </div>
+              <div className="p-8 space-y-4">
+                {challenges.map((item, i) => (
+                  <div key={i} className="flex gap-4 items-start group">
+                    <div className="mt-0.5 h-6 w-6 rounded-full bg-red-100 flex items-center justify-center shrink-0 group-hover:bg-red-200 transition-colors">
+                      <span className="text-xs font-bold text-red-600">{i + 1}</span>
+                    </div>
+                    <p className="text-slate-700 text-sm leading-relaxed">{item}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
 
-<div className="bg-white p-8 rounded-3xl shadow">
-<h3 className="text-2xl font-extrabold mb-6">Services</h3>
-{services.map((item, i) => (
-<div key={i} className="flex gap-3 mb-4">
-<CheckCircle2 className="text-cyan-600"/>
-<p>{item}</p>
-</div>
-))}
-</div>
+            {/* Services */}
+            <div className="bg-white rounded-3xl shadow-sm border border-slate-100 overflow-hidden">
+              <div className="bg-cyan-50 px-8 py-5 border-b border-cyan-100">
+                <h3 className="text-xl font-extrabold text-slate-800">Our Services</h3>
+                <p className="text-sm text-slate-500 mt-1">Solutions we provide</p>
+              </div>
+              <div className="p-8 space-y-4">
+                {services.map(({ icon: Icon, text }, i) => (
+                  <div key={i} className="flex gap-4 items-start group hover:bg-cyan-50/50 p-2 -mx-2 rounded-xl transition-colors">
+                    <div className="mt-0.5 h-8 w-8 rounded-lg bg-cyan-100 flex items-center justify-center shrink-0 group-hover:bg-cyan-200 transition-colors">
+                      <Icon className="h-4 w-4 text-cyan-600" />
+                    </div>
+                    <p className="text-slate-700 text-sm leading-relaxed">{text}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
 
-</div>
-</section>
+      {/* ── BENEFITS ── */}
+      <section className="py-20 bg-slate-900 text-white relative overflow-hidden">
+        <div
+          className="absolute inset-0 opacity-5"
+          style={{
+            backgroundImage: 'radial-gradient(circle at 2px 2px, white 1px, transparent 0)',
+            backgroundSize: '40px 40px',
+          }}
+        />
+        <div className="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent" />
 
-{/* BENEFITS */}
-<section className="py-16 bg-slate-900 text-white">
-<div className="max-w-7xl mx-auto px-4">
+        <div className="relative max-w-7xl mx-auto px-4">
+          <div className="text-center mb-14">
+            <span className="inline-block text-xs font-semibold uppercase tracking-widest text-cyan-400 mb-3">Why Choose Us</span>
+            <ColoredHeading
+              text="Key Benefits of Customer Support Outsourcing"
+              className="text-5xl font-extrabold text-white"
+            />
+          </div>
 
-<h2 className="text-5xl font-extrabold text-center">
-Key Benefits of Customer Support Outsourcing
-</h2>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {benefits.map(({ icon: Icon, title, desc }, i) => (
+              <div
+                key={i}
+                className="group p-6 rounded-2xl border border-white/10 hover:border-cyan-400/40 bg-white/5 hover:bg-white/10 transition-all duration-300 hover:-translate-y-1 cursor-default"
+              >
+                <div className="h-10 w-10 rounded-xl bg-cyan-400/10 border border-cyan-400/20 flex items-center justify-center mb-4 group-hover:bg-cyan-400/20 transition-colors">
+                  <Icon className="h-5 w-5 text-cyan-400" />
+                </div>
+                <h4 className="font-bold text-white mb-2">{title}</h4>
+                <p className="text-slate-400 text-sm leading-relaxed">{desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-<div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-8 mt-12">
-{benefits.map((item, i) => (
-<div key={i} className="bg-white/5 p-6 rounded-2xl">
-<CheckCircle2 className="text-cyan-400 mb-3"/>
-<p>{item}</p>
-</div>
-))}
-</div>
+      {/* ── PROCESS STRIP ── */}
+      <section className="py-16 bg-white">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="text-center mb-12">
+            <span className="inline-block text-xs font-semibold uppercase tracking-widest text-cyan-600 mb-3">How It Works</span>
+            <ColoredHeading
+              text="Our Simple Engagement Process"
+              className="text-5xl font-extrabold"
+            />
+          </div>
 
-</div>
-</section>
+          <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6 relative">
+            <div className="hidden lg:block absolute top-10 left-[12.5%] right-[12.5%] h-px bg-gradient-to-r from-cyan-200 via-cyan-400 to-cyan-200 z-0" />
 
-{/* FAQ */}
-<section className="bg-cyan-100/40 py-16">
-<div className="max-w-5xl mx-auto px-4">
+            {[
+              { step: '01', title: 'Onboard',  desc: 'We learn your brand voice, products, and support workflows inside-out.' },
+              { step: '02', title: 'Setup',    desc: 'Channels, CRM tools, and escalation paths configured and ready to go.' },
+              { step: '03', title: 'Support',  desc: 'Expert agents go live and handle every interaction with care and speed.' },
+              { step: '04', title: 'Improve',  desc: 'Regular reporting and coaching loops to continuously raise the bar.' },
+            ].map((p, i) => (
+              <div key={i} className="relative z-10 flex flex-col items-center text-center group">
+                <div className="h-20 w-20 rounded-2xl bg-white border-2 border-cyan-200 group-hover:border-cyan-500 flex flex-col items-center justify-center shadow-sm group-hover:shadow-cyan-100 transition-all duration-300 group-hover:-translate-y-1">
+                  <span className="text-xs font-bold text-cyan-400">{p.step}</span>
+                  <span className="text-sm font-extrabold text-slate-800 mt-0.5">{p.title}</span>
+                </div>
+                <p className="mt-4 text-slate-500 text-sm leading-relaxed max-w-[180px]">{p.desc}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-<h2 className="text-5xl font-extrabold text-center">
-Frequently Asked Questions
-</h2>
+      {/* ── FAQ ── */}
+      <section className="py-20 bg-slate-50">
+        <div className="max-w-4xl mx-auto px-4">
+          <div className="text-center mb-14">
+            <span className="inline-block text-xs font-semibold uppercase tracking-widest text-cyan-600 mb-3">Got Questions?</span>
+            <ColoredHeading
+              text="Frequently Asked Questions"
+              className="text-5xl font-extrabold"
+            />
+          </div>
 
-<div className="mt-10 space-y-4">
+          <div className="space-y-3">
+            {faqs.map((faq, i) => (
+              <div
+                key={i}
+                className={`bg-white rounded-2xl border transition-all duration-300 overflow-hidden ${openIndex === i ? 'border-cyan-200 shadow-md shadow-cyan-50' : 'border-slate-100 hover:border-slate-200 shadow-sm'}`}
+              >
+                <button
+                  onClick={() => setOpenIndex(openIndex === i ? null : i)}
+                  className="w-full flex justify-between items-center px-6 py-5 text-left"
+                >
+                  <h3 className="font-bold text-slate-800 pr-4">{faq.q}</h3>
+                  <div className={`h-6 w-6 rounded-full flex items-center justify-center shrink-0 transition-all duration-300 ${openIndex === i ? 'bg-cyan-500 rotate-180' : 'bg-slate-100'}`}>
+                    <ChevronDown className={`h-3.5 w-3.5 transition-colors ${openIndex === i ? 'text-white' : 'text-slate-500'}`} />
+                  </div>
+                </button>
+                <div className={`overflow-hidden transition-all duration-300 ${openIndex === i ? 'max-h-60' : 'max-h-0'}`}>
+                  <p className="px-6 pb-5 text-slate-600 text-sm leading-relaxed border-t border-slate-50 pt-4">{faq.a}</p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
 
-{faqs.map((faq, i) => (
-<div key={i} className="bg-white rounded-2xl shadow">
+      {/* ── CTA ── */}
+      <section className="relative overflow-hidden bg-gradient-to-br from-slate-950 via-cyan-950 to-slate-900 text-white py-16">
+        <div
+          className="absolute inset-0 opacity-10"
+          style={{
+            backgroundImage:
+              'linear-gradient(rgba(6,182,212,0.4) 1px, transparent 1px), linear-gradient(90deg, rgba(6,182,212,0.4) 1px, transparent 1px)',
+            backgroundSize: '50px 50px',
+          }}
+        />
+        <div className="absolute top-0    left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent" />
+        <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-cyan-400/30 to-transparent" />
+        <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-cyan-500/5 rounded-full blur-3xl" />
 
-<button
-onClick={() => setOpenIndex(openIndex === i ? null : i)}
-className="w-full flex justify-between items-center p-6"
->
-<h3>{faq.q}</h3>
-<ChevronDown className={`transition ${openIndex === i ? "rotate-180" : ""}`} />
-</button>
+        <div className="relative max-w-4xl mx-auto px-4 text-center">
+          <span className="inline-flex items-center rounded-full bg-white/10 border border-white/20 px-4 py-2 text-sm tracking-wide text-cyan-300 mb-6">
+            🚀 Customer Support Experts
+          </span>
 
-{openIndex === i && (
-<div className="px-6 pb-6 text-slate-600">
-{faq.a}
-</div>
-)}
+          <ColoredHeading
+            text="Elevate Your Customer Experience with Scalable Support Solutions"
+            className="text-5xl sm:text-5xl font-extrabold leading-tight text-white"
+          />
 
-</div>
-))}
+          <p className="mt-6 text-lg text-cyan-100/80 max-w-2xl mx-auto leading-relaxed">
+            Improve response time, enhance customer satisfaction, and reduce costs with our expert outsourcing solutions.
+          </p>
 
-</div>
+          <div className="mt-10 flex flex-col sm:flex-row justify-center gap-4">
+            <button
+              onClick={() => setIsModalOpen(true)}
+              className="group inline-flex items-center justify-center rounded-2xl bg-cyan-500 hover:bg-cyan-400 px-8 py-4 text-lg font-semibold text-slate-900 shadow-xl hover:shadow-cyan-500/30 transition-all duration-300 hover:scale-105 gap-2"
+            >
+              Get Started Now
+              <ArrowRight className="h-5 w-5 group-hover:translate-x-1 transition-transform" />
+            </button>
 
-</div>
-</section>
+            <a
+              href="#services"
+              className="inline-flex items-center justify-center rounded-2xl border border-white/20 hover:border-cyan-400/50 px-8 py-4 text-lg font-semibold hover:bg-white/10 transition-all duration-300"
+            >
+              Explore Services
+            </a>
+          </div>
+        </div>
+      </section>
 
-{/* CTA */}
-<section className="relative overflow-hidden bg-gradient-to-br from-cyan-600 via-cyan-700 to-slate-900 text-white py-12">
-
-<div className="absolute inset-0 opacity-30">
-  <div className="absolute top-0 left-1/4 w-80 h-80 bg-white/20 rounded-full blur-3xl"></div>
-  <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-purple-500/30 rounded-full blur-3xl"></div>
-</div>
-
-<div className="relative max-w-6xl mx-auto px-4 text-center">
-
-<span className="inline-flex items-center rounded-full bg-white/10 border border-white/20 px-4 py-2 text-sm tracking-wide">
-  🚀 Customer Support Experts
-</span>
-
-<h2 className="mt-3 text-4xl sm:text-5xl font-extrabold leading-tight">
-  Elevate Your Customer Experience with
-  <span className="block text-cyan-200">
-    Scalable Support Solutions
-  </span>
-</h2>
-
-<p className="mt-3 text-lg text-cyan-100 max-w-2xl mx-auto leading-relaxed">
-  Improve response time, enhance customer satisfaction, and reduce costs with our expert outsourcing solutions.
-</p>
-
-<div className="mt-6 flex flex-col sm:flex-row justify-center gap-4">
-
-<button
-  onClick={() => setIsModalOpen(true)}
-  className="inline-flex items-center justify-center rounded-2xl bg-white px-8 py-4 text-lg font-semibold text-cyan-700 shadow-xl hover:bg-slate-100 transition-all"
->
-  Get Started Now
-</button>
-
-<a
-  href="#services"
-  className="inline-flex items-center justify-center rounded-2xl border border-white/30 px-8 py-4 text-lg font-semibold hover:bg-white/10 transition"
->
-  Explore Services
-</a>
-
-</div>
-
-</div>
-</section>
-
-<GetStartedModal
-isOpen={isModalOpen}
-onClose={() => setIsModalOpen(false)}
-selectedBusinessType={selectedBusinessType}
-/>
-
-</div>
-);
+      <GetStartedModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        selectedBusinessType={selectedBusinessType}
+      />
+    </div>
+  );
 }
