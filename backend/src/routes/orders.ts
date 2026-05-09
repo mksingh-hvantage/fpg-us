@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import Stripe from 'stripe';
 import { prisma } from '../index.js';
 import { authenticate } from '../middleware/auth.js';
-import { sendOrderPendingEmail, sendWelcomeEmail } from '../utils/email.js';
+import { sendOrderPendingEmail, sendWelcomeEmail, sendOrderStatusEmail } from '../utils/email.js';
 
 const router = Router();
 
@@ -206,11 +206,32 @@ router.put('/:id', authenticate, async (req: Request, res: Response): Promise<vo
     if (notes !== undefined) data.notes = notes;
     if (assignedToId !== undefined) data.assignedToId = assignedToId || null;
 
+    // Read previous status to detect change
+    const previous = await prisma.order.findUnique({
+      where: { id: req.params.id },
+      select: { status: true },
+    });
+
     const order = await prisma.order.update({
       where: { id: req.params.id },
       data,
       include: { assignedTo: { select: { id: true, fullName: true, email: true } } },
     });
+
+    // Notify customer when admin changes the status
+    if (status && previous && previous.status !== status && order.contactEmail) {
+      const customerName = `${order.contactFirstName} ${order.contactLastName}`.trim();
+      sendOrderStatusEmail(order.contactEmail, {
+        orderNumber: order.orderNumber,
+        companyName: order.llcName,
+        packageType: order.packageType,
+        state: order.state,
+        status: order.status as 'PENDING' | 'PROCESSING' | 'FILED' | 'COMPLETED' | 'CANCELLED',
+        customerName,
+        notes: order.notes,
+      }).catch((e) => console.error('Order status email error:', e));
+    }
+
     res.json(order);
   } catch (error) {
     console.error('Update order error:', error);

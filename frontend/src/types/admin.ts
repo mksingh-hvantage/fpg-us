@@ -1,6 +1,6 @@
 export type Role = 'SUPER_ADMIN' | 'ADMIN' | 'EDITOR';
 export type OrderStatus = 'PENDING' | 'PROCESSING' | 'FILED' | 'COMPLETED' | 'CANCELLED';
-export type ContactStatus = 'NEW' | 'CONTACTED' | 'CONVERTED' | 'CLOSED';
+export type ContactStatus = 'NEW' | 'CONTACTED' | 'CONVERTED' | 'CLOSED' | 'CANCELLED';
 export type TaskType = 'COMPLIANCE' | 'UPSELL' | 'FILING' | 'GENERAL';
 export type TaskStatus = 'PENDING' | 'IN_PROGRESS' | 'COMPLETED' | 'CANCELLED';
 export type TaskPriority = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT';

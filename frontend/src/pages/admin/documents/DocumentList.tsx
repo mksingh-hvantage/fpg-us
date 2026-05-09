@@ -1,7 +1,7 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Upload, X } from 'lucide-react';
+import { Upload, X, Pencil, Trash2, Download } from 'lucide-react';
 import DataTable from '../../../components/admin/DataTable';
-import { getDocuments, uploadDocument } from '../../../services/documentService';
+import { getDocuments, uploadDocument, updateDocument, deleteDocument, getDownloadUrl } from '../../../services/documentService';
 import { useAuth } from '../../../contexts/AuthContext';
 import type { Document as DocType, DocumentCategory } from '../../../types/admin';
 
@@ -25,13 +25,23 @@ export default function DocumentList() {
   const [showUpload, setShowUpload] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [uploadError, setUploadError] = useState('');
-  const { canCreate } = useAuth();
+  const { canCreate, canEdit, canDelete } = useAuth();
   const [uploadForm, setUploadForm] = useState({
     file: null as File | null,
     category: 'GENERAL' as DocumentCategory,
     orderId: '',
     notes: '',
   });
+
+  const [editDoc, setEditDoc] = useState<DocType | null>(null);
+  const [editForm, setEditForm] = useState({
+    fileName: '',
+    category: 'GENERAL' as DocumentCategory,
+    orderId: '',
+    notes: '',
+  });
+  const [savingEdit, setSavingEdit] = useState(false);
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const fetchDocuments = useCallback(async () => {
     setLoading(true);
@@ -51,6 +61,55 @@ export default function DocumentList() {
   }, [category, search, page]);
 
   useEffect(() => { fetchDocuments(); }, [fetchDocuments]);
+
+  const openEdit = (doc: DocType) => {
+    setEditDoc(doc);
+    setEditForm({
+      fileName: doc.fileName || '',
+      category: (doc.category as DocumentCategory) || 'GENERAL',
+      orderId: doc.order?.id || '',
+      notes: doc.notes || '',
+    });
+  };
+
+  const handleEditSave = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editDoc) return;
+    setSavingEdit(true);
+    try {
+      await updateDocument(editDoc.id, {
+        fileName: editForm.fileName,
+        category: editForm.category,
+        orderId: editForm.orderId || null,
+        notes: editForm.notes,
+      });
+      setEditDoc(null);
+      fetchDocuments();
+    } catch (err) {
+      console.error('Failed to update document:', err);
+      alert('Failed to update document.');
+    } finally {
+      setSavingEdit(false);
+    }
+  };
+
+  const handleDelete = async (doc: DocType) => {
+    if (!confirm(`Delete "${doc.fileName}"? This cannot be undone.`)) return;
+    setDeletingId(doc.id);
+    try {
+      await deleteDocument(doc.id);
+      fetchDocuments();
+    } catch (err) {
+      console.error('Failed to delete document:', err);
+      alert('Failed to delete document.');
+    } finally {
+      setDeletingId(null);
+    }
+  };
+
+  const handleDownload = (doc: DocType) => {
+    window.open(getDownloadUrl(doc.id), '_blank');
+  };
 
   const handleUpload = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -101,6 +160,40 @@ export default function DocumentList() {
       label: 'Date',
       sortable: true,
       render: (doc: DocType) => new Date(doc.createdAt).toLocaleDateString(),
+    },
+    {
+      key: 'actions',
+      label: 'Actions',
+      render: (doc: DocType) => (
+        <div className="flex items-center gap-2">
+          <button
+            onClick={(e) => { e.stopPropagation(); handleDownload(doc); }}
+            className="p-1.5 rounded hover:bg-gray-100 text-gray-600"
+            title="Download"
+          >
+            <Download className="w-4 h-4" />
+          </button>
+          {canEdit('Documents') && (
+            <button
+              onClick={(e) => { e.stopPropagation(); openEdit(doc); }}
+              className="p-1.5 rounded hover:bg-cyan-50 text-cyan-600"
+              title="Edit"
+            >
+              <Pencil className="w-4 h-4" />
+            </button>
+          )}
+          {canDelete('Documents') && (
+            <button
+              onClick={(e) => { e.stopPropagation(); handleDelete(doc); }}
+              disabled={deletingId === doc.id}
+              className="p-1.5 rounded hover:bg-red-50 text-red-600 disabled:opacity-50"
+              title="Delete"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          )}
+        </div>
+      ),
     },
   ];
 
@@ -225,6 +318,85 @@ export default function DocumentList() {
                 <button
                   type="button"
                   onClick={() => setShowUpload(false)}
+                  className="flex-1 py-2 rounded-lg text-sm font-medium text-gray-600 border border-gray-300 hover:bg-gray-50"
+                >
+                  Cancel
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Modal */}
+      {editDoc && (
+        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">Edit Document</h3>
+              <button onClick={() => setEditDoc(null)} className="p-1 rounded-lg hover:bg-gray-100">
+                <X className="w-5 h-5 text-gray-500" />
+              </button>
+            </div>
+
+            <form onSubmit={handleEditSave} className="space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">File Name</label>
+                <input
+                  type="text"
+                  value={editForm.fileName}
+                  onChange={(e) => setEditForm((prev) => ({ ...prev, fileName: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Category</label>
+                <select
+                  value={editForm.category}
+                  onChange={(e) => setEditForm((prev) => ({ ...prev, category: e.target.value as DocumentCategory }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none"
+                >
+                  {categoryOptions.filter((c) => c !== 'all').map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Order ID (optional)</label>
+                <input
+                  type="text"
+                  value={editForm.orderId}
+                  onChange={(e) => setEditForm((prev) => ({ ...prev, orderId: e.target.value }))}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none"
+                  placeholder="Paste order ID if linked"
+                />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">Notes</label>
+                <textarea
+                  value={editForm.notes}
+                  onChange={(e) => setEditForm((prev) => ({ ...prev, notes: e.target.value }))}
+                  rows={3}
+                  className="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:ring-2 focus:ring-cyan-500 focus:border-transparent outline-none"
+                  placeholder="Optional notes..."
+                />
+              </div>
+
+              <div className="flex gap-3 pt-2">
+                <button
+                  type="submit"
+                  disabled={savingEdit}
+                  className="flex-1 bg-cyan-600 text-white py-2 rounded-lg text-sm font-medium hover:bg-cyan-700 disabled:opacity-50"
+                >
+                  {savingEdit ? 'Saving...' : 'Save Changes'}
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEditDoc(null)}
                   className="flex-1 py-2 rounded-lg text-sm font-medium text-gray-600 border border-gray-300 hover:bg-gray-50"
                 >
                   Cancel

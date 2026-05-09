@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import emailjs from '@emailjs/browser';
 import { createContact } from '../services/contactService';
 
 interface GetStartedModalProps {
@@ -26,25 +25,7 @@ export default function GetStartedModal({ isOpen, onClose, selectedBusinessType 
     e.preventDefault();
 
     try {
-
-      // ADMIN EMAIL
-      await emailjs.send(
-        "service_4p4ycnm",
-        "template_38fdigo",
-        formData,
-        "pggGn4-wVQgh_q_lJ"
-      );
-
-      // USER THANK YOU EMAIL
-      await emailjs.send(
-        "service_4p4ycnm",
-        "template_nud1bya",
-        formData,
-        "pggGn4-wVQgh_q_lJ"
-      );
-
-      // Save contact to backend
-      createContact({
+      await createContact({
         source: 'get_started',
         name: formData.name,
         email: formData.email,
@@ -52,7 +33,7 @@ export default function GetStartedModal({ isOpen, onClose, selectedBusinessType 
         businessType: formData.businessType,
         businessName: formData.businessName,
         state: formData.state,
-      }).catch((err) => console.error('Failed to save contact:', err));
+      });
 
       setShowThankYou(true);
 
@@ -64,10 +45,9 @@ export default function GetStartedModal({ isOpen, onClose, selectedBusinessType 
         state: '',
         businessName: ''
       });
-
     } catch (error) {
-      console.error("Email Error:", error);
-      alert("Something went wrong. Please try again.");
+      console.error('Failed to submit:', error);
+      alert('Something went wrong. Please try again.');
     }
   };
 

@@ -123,6 +123,33 @@ router.get('/:id/download', async (req: Request, res: Response): Promise<void> =
   }
 });
 
+// PUT /api/documents/:id (update metadata — category, notes, orderId, fileName)
+router.put('/:id', async (req: Request, res: Response): Promise<void> => {
+  try {
+    const { category, notes, orderId, fileName } = req.body;
+    const data: Record<string, unknown> = {};
+    if (category !== undefined) data.category = category;
+    if (notes !== undefined) data.notes = notes;
+    if (orderId !== undefined) data.orderId = orderId || null;
+    if (fileName !== undefined) data.fileName = fileName;
+
+    const doc = await prisma.document.update({
+      where: { id: req.params.id },
+      data,
+      include: {
+        uploadedBy: { select: { id: true, fullName: true } },
+        order: { select: { id: true, orderNumber: true, llcName: true } },
+      },
+    });
+
+    await logAudit({ userId: req.user!.userId, action: 'UPDATE', entity: 'Document', entityId: doc.id, req });
+    res.json(doc);
+  } catch (error) {
+    console.error('Update document error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 // DELETE /api/documents/:id
 router.delete('/:id', async (req: Request, res: Response): Promise<void> => {
   try {

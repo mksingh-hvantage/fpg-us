@@ -7,7 +7,7 @@ import InternalNotes from '../../../components/admin/InternalNotes';
 import { useAuth } from '../../../contexts/AuthContext';
 import type { Contact, ContactStatus } from '../../../types/admin';
 
-const statusOptions: ContactStatus[] = ['NEW', 'CONTACTED', 'CONVERTED', 'CLOSED'];
+const statusOptions: ContactStatus[] = ['NEW', 'CONTACTED', 'CONVERTED', 'CLOSED', 'CANCELLED'];
 
 export default function ContactDetail() {
   const { id } = useParams<{ id: string }>();

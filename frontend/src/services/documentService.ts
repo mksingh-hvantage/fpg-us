@@ -18,6 +18,11 @@ export async function uploadDocument(formData: FormData) {
   return res.data as Document;
 }
 
+export async function updateDocument(id: string, data: { category?: string; notes?: string; orderId?: string | null; fileName?: string }) {
+  const res = await api.put(`/documents/${id}`, data);
+  return res.data as Document;
+}
+
 export async function deleteDocument(id: string) {
   await api.delete(`/documents/${id}`);
 }

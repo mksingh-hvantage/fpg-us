@@ -2,9 +2,9 @@ import { NavLink, useLocation } from 'react-router-dom';
 import {
   LayoutDashboard, ShoppingCart, Users, FileText, MapPin, ScrollText,
   Factory, Package as PackageIcon, UserCog, ChevronDown,
-  CheckSquare, FolderOpen, Mail, Bell, Briefcase, Lightbulb,
-  CreditCard, Receipt, BarChart3, Settings, BookOpen, Flag,
-  HelpCircle, Image, Key, FileCode, Shield, ClipboardList
+  FolderOpen,
+  CreditCard, Receipt, BarChart3, Settings, Flag,
+  Shield, ClipboardList
 } from 'lucide-react';
 import { useState } from 'react';
 import { useAuth } from '../../contexts/AuthContext';
@@ -24,9 +24,7 @@ const mainItems: NavItem[] = [
 const operationsItems: NavItem[] = [
   { to: '/admin/orders', icon: ShoppingCart, label: 'Orders', module: 'Orders' },
   { to: '/admin/contacts', icon: Users, label: 'Contacts', module: 'Contacts' },
-  { to: '/admin/tasks', icon: CheckSquare, label: 'Tasks', module: 'Tasks' },
   { to: '/admin/documents', icon: FolderOpen, label: 'Documents', module: 'Documents' },
-  { to: '/admin/mailroom', icon: Mail, label: 'Mailroom', module: 'Mailroom' },
 ];
 
 const contentItems: NavItem[] = [
@@ -35,15 +33,6 @@ const contentItems: NavItem[] = [
   { to: '/admin/contracts', icon: ScrollText, label: 'Contracts', module: 'Contracts' },
   { to: '/admin/industries', icon: Factory, label: 'Industries', module: 'Industries' },
   { to: '/admin/packages', icon: PackageIcon, label: 'Packages', module: 'Packages' },
-  { to: '/admin/cms', icon: BookOpen, label: 'CMS Pages', module: 'CMS' },
-  { to: '/admin/cms/faqs', icon: HelpCircle, label: 'FAQs', module: 'FAQ' },
-  { to: '/admin/cms/banners', icon: Image, label: 'Banners', module: 'Banners' },
-];
-
-const businessItems: NavItem[] = [
-  { to: '/admin/services', icon: Briefcase, label: 'Services', module: 'Services' },
-  { to: '/admin/recommendations', icon: Lightbulb, label: 'Recommendations', module: 'Recommendations' },
-  { to: '/admin/notifications', icon: Bell, label: 'Notifications', module: 'Notifications' },
 ];
 
 const financeItems: NavItem[] = [
@@ -58,8 +47,6 @@ const adminItems: NavItem[] = [
   { to: '/admin/audit-logs', icon: Shield, label: 'Audit Logs', module: 'AuditLogs' },
   { to: '/admin/settings', icon: Settings, label: 'Settings', module: 'Settings' },
   { to: '/admin/state-rules', icon: ClipboardList, label: 'State Rules' },
-  { to: '/admin/api-keys', icon: Key, label: 'API Keys' },
-  { to: '/admin/email-templates', icon: FileCode, label: 'Email Templates', module: 'EmailTemplates' },
 ];
 
 interface SectionProps {
@@ -92,7 +79,7 @@ function CollapsibleSection({ label, icon: Icon, items, defaultOpen = false, lin
       {open && (
         <div className="mt-1 space-y-0.5">
           {items.map((item) => (
-            <NavLink key={item.to} to={item.to} end={item.to === '/admin/cms/faqs' || item.to === '/admin/cms/banners' ? true : undefined} className={linkClass}>
+            <NavLink key={item.to} to={item.to} className={linkClass}>
               <item.icon className="w-4 h-4" />
               {item.label}
             </NavLink>
@@ -117,7 +104,6 @@ export default function AdminSidebar() {
 
   const filteredOps = filterItems(operationsItems);
   const filteredContent = filterItems(contentItems);
-  const filteredBusiness = filterItems(businessItems);
   const filteredFinance = filterItems(financeItems);
 
   return (
@@ -141,9 +127,6 @@ export default function AdminSidebar() {
 
         {/* Content */}
         <CollapsibleSection label="Content" icon={FileText} items={filteredContent} defaultOpen={false} linkClass={linkClass} />
-
-        {/* Operations */}
-        <CollapsibleSection label="Operations" icon={Briefcase} items={filteredBusiness} defaultOpen={false} linkClass={linkClass} />
 
         {/* Finance */}
         <CollapsibleSection label="Finance" icon={CreditCard} items={filteredFinance} defaultOpen={false} linkClass={linkClass} />

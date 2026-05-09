@@ -1,6 +1,7 @@
 import { Router, Request, Response } from 'express';
 import { prisma } from '../index.js';
 import { authenticate } from '../middleware/auth.js';
+import { sendContactAdminEmail, sendContactCustomerEmail } from '../utils/email.js';
 
 const router = Router();
 
@@ -16,6 +17,12 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
     const contact = await prisma.contact.create({
       data: { source, name, email, phone, subject, message, businessType, businessName, state },
     });
+
+    // Fire-and-forget — don't block response on email delivery
+    const emailData = { source, name, email, phone, subject, message, businessType, businessName, state };
+    sendContactAdminEmail(emailData).catch((e) => console.error('Admin email error:', e));
+    sendContactCustomerEmail(emailData).catch((e) => console.error('Customer email error:', e));
+
     res.status(201).json(contact);
   } catch (error) {
     console.error('Create contact error:', error);

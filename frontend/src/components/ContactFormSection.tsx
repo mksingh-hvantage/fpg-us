@@ -14,7 +14,7 @@ export default function ContactFormSection() {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    // Save contact to backend
+    // Save contact to backend (backend sends admin + customer emails via SendGrid)
     createContact({
       source: 'contact_form',
       name: formData.name,

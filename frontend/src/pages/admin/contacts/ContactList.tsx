@@ -3,10 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import { Download } from 'lucide-react';
 import DataTable from '../../../components/admin/DataTable';
 import StatusBadge from '../../../components/admin/StatusBadge';
-import { getContacts } from '../../../services/contactService';
-import type { Contact } from '../../../types/admin';
+import { getContacts, updateContact } from '../../../services/contactService';
+import { useAuth } from '../../../contexts/AuthContext';
+import type { Contact, ContactStatus } from '../../../types/admin';
 
-const statusOptions = ['all', 'NEW', 'CONTACTED', 'CONVERTED', 'CLOSED'];
+const statusOptions = ['all', 'NEW', 'CONTACTED', 'CONVERTED', 'CLOSED', 'CANCELLED'];
+const editableStatuses: ContactStatus[] = ['NEW', 'CONTACTED', 'CONVERTED', 'CLOSED', 'CANCELLED'];
 const sourceOptions = ['all', 'contact_form', 'support', 'get_started', 'contact_page'];
 
 export default function ContactList() {
@@ -18,7 +20,10 @@ export default function ContactList() {
   const [status, setStatus] = useState('all');
   const [source, setSource] = useState('all');
   const [search, setSearch] = useState('');
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { canEdit } = useAuth();
+  const allowEdit = canEdit('Contacts');
 
   const [exporting, setExporting] = useState(false);
 
@@ -76,12 +81,48 @@ export default function ContactList() {
 
   useEffect(() => { fetchContacts(); }, [fetchContacts]);
 
+  const handleStatusChange = async (contactId: string, newStatus: ContactStatus) => {
+    setUpdatingId(contactId);
+    try {
+      const updated = await updateContact(contactId, { status: newStatus });
+      setContacts((prev) => prev.map((c) => (c.id === contactId ? { ...c, status: updated.status } : c)));
+    } catch (err) {
+      console.error('Failed to update status:', err);
+      alert('Failed to update status. Please try again.');
+    } finally {
+      setUpdatingId(null);
+    }
+  };
+
   const columns = [
     { key: 'name', label: 'Name', sortable: true },
     { key: 'email', label: 'Email', sortable: true },
     { key: 'phone', label: 'Phone' },
     { key: 'source', label: 'Source', render: (c: Contact) => <span className="capitalize">{c.source.replace(/_/g, ' ')}</span> },
-    { key: 'status', label: 'Status', render: (c: Contact) => <StatusBadge status={c.status} /> },
+    {
+      key: 'status',
+      label: 'Status',
+      render: (c: Contact) => (
+        allowEdit ? (
+          <select
+            value={c.status}
+            onClick={(e) => e.stopPropagation()}
+            onChange={(e) => {
+              e.stopPropagation();
+              handleStatusChange(c.id, e.target.value as ContactStatus);
+            }}
+            disabled={updatingId === c.id}
+            className="px-2 py-1 border border-gray-300 rounded text-xs font-medium bg-white hover:bg-gray-50 cursor-pointer disabled:opacity-50"
+          >
+            {editableStatuses.map((s) => (
+              <option key={s} value={s}>{s}</option>
+            ))}
+          </select>
+        ) : (
+          <StatusBadge status={c.status} />
+        )
+      ),
+    },
     { key: 'createdAt', label: 'Date', sortable: true, render: (c: Contact) => new Date(c.createdAt).toLocaleDateString() },
   ];
 
