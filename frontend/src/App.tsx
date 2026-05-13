@@ -3,7 +3,7 @@ import Header from './components/Header';
 import Footer from './components/Footer';
 import ScrollToTop from './components/ScrollToTop';
 import PageWrapper from './components/PageWrapper';
-  
+   
 // Admin imports
 import AdminLogin from './pages/admin/AdminLogin';
 import ProtectedRoute from './components/admin/ProtectedRoute';

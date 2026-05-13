@@ -2,7 +2,7 @@ import GetStartedModal from '../components/GetStartedModal';
 import {
   Cloud,
   CheckCircle2,
-  ArrowRight,
+  ArrowRight, 
   ChevronDown
 } from "lucide-react";
 import { useState } from 'react';
