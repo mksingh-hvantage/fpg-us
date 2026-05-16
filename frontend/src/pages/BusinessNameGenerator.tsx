@@ -1,7 +1,10 @@
 import { useState, useEffect } from 'react';
-import { Check, X, ChevronDown, Star } from 'lucide-react';
+import { Check, X, ChevronDown, Star, Search } from 'lucide-react';
 import { Helmet } from "react-helmet-async";
 import GetStartedModal from '../components/GetStartedModal';
+import { states as ALL_STATES } from '../data/states';
+
+const ENTITY_TYPES = ['LLC', 'C-Corporation', 'S-Corporation', 'Nonprofit', 'DBA'] as const;
 
 /* ── Utility: wraps the last two words of a heading in cyan ── */
 function ColoredHeading({ text, className = '' }: { text: string; className?: string }) {
@@ -35,8 +38,16 @@ function Particle({ style }: { style: React.CSSProperties }) {
 }
 
 export default function BusinessNameGenerator() {
-  const [keywords, setKeywords] = useState('');
-  const [generatedNames, setGeneratedNames] = useState<string[]>([]);
+  const [search, setSearch] = useState({
+    businessName: '',
+    entityType: '',
+    state: '',
+    firstName: '',
+    lastName: '',
+    email: '',
+    agree: false,
+  });
+  const [searchResult, setSearchResult] = useState<{ name: string; state: string; entityType: string } | null>(null);
   const [openFaqIndex, setOpenFaqIndex] = useState<number | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedBusinessType, setSelectedBusinessType] = useState<string>('');
@@ -48,20 +59,22 @@ export default function BusinessNameGenerator() {
     return () => clearTimeout(t);
   }, []);
 
-  /* ── name generator (unchanged logic) ── */
-  const generateNames = () => {
-    if (!keywords.trim()) return;
-    const suffixes = ['Pro', 'Hub', 'Labs', 'Works', 'Group', 'Solutions', 'Services', 'Co', 'Digital', 'Tech'];
-    const prefixes = ['Smart', 'Elite', 'Prime', 'Next', 'Peak', 'Apex', 'Core', 'Global', 'Bright', 'Swift'];
-    const keyword = keywords.trim();
-    const names: string[] = [];
-    for (let i = 0; i < 20; i++) {
-      const r = Math.random();
-      if (r < 0.33) names.push(`${prefixes[Math.floor(Math.random() * prefixes.length)]} ${keyword}`);
-      else if (r < 0.66) names.push(`${keyword} ${suffixes[Math.floor(Math.random() * suffixes.length)]}`);
-      else names.push(`${prefixes[Math.floor(Math.random() * prefixes.length)]} ${keyword} ${suffixes[Math.floor(Math.random() * suffixes.length)]}`);
-    }
-    setGeneratedNames(names);
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (
+      !search.businessName.trim() ||
+      !search.entityType ||
+      !search.state ||
+      !search.firstName.trim() ||
+      !search.lastName.trim() ||
+      !search.email.trim() ||
+      !search.agree
+    ) return;
+    setSearchResult({
+      name: search.businessName.trim(),
+      state: search.state,
+      entityType: search.entityType,
+    });
   };
 
   const faqs = [
@@ -233,59 +246,177 @@ export default function BusinessNameGenerator() {
               that stand out in search results and attract more customers.
             </p>
 
-            {/* ── FORM — logic completely unchanged ── */}
-            <div
-              className="bng-fade-up bng-scan relative max-w-4xl mx-auto bg-white/5 border border-cyan-900/50 rounded-2xl p-8 backdrop-blur-sm"
+            {/* ── BIZEE-STYLE BUSINESS NAME SEARCH FORM ── */}
+            <form
+              onSubmit={handleSearch}
+              className="bng-fade-up bng-scan relative max-w-5xl mx-auto bg-white/5 border border-cyan-900/50 rounded-2xl p-6 sm:p-10 backdrop-blur-sm text-left"
               style={{ animationDelay: '.4s', opacity: heroReady ? undefined : 0 }}
             >
-              <div className="flex flex-col sm:flex-row gap-4">
-                <input
-                  type="text"
-                  value={keywords}
-                  onChange={(e) => setKeywords(e.target.value)}
-                  onKeyPress={(e) => e.key === 'Enter' && generateNames()}
-                  placeholder="e.g., consulting, tech, design"
-                  className="bng-input-glow flex-1 px-6 py-4 border-2 border-gray-600 rounded-xl bg-gray-900 text-white placeholder-gray-500 text-lg transition-all"
-                />
-                <button
-                  onClick={generateNames}
-                  className="bng-pulse-btn bg-cyan-600 text-white px-10 py-4 rounded-xl font-bold hover:bg-cyan-500 transition-all hover:shadow-lg whitespace-nowrap text-lg"
-                >
-                  Generate Names
-                </button>
+              {/* Section 1 — Business Name Information */}
+              <h3 className="text-lg sm:text-xl font-bold text-white mb-4">
+                Enter Your Business Name Information
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label htmlFor="bng-name" className="block text-sm font-semibold text-gray-300 mb-2">
+                    Request Business Name <span className="text-cyan-400">*</span>
+                  </label>
+                  <input
+                    id="bng-name"
+                    type="text"
+                    value={search.businessName}
+                    onChange={(e) => setSearch({ ...search, businessName: e.target.value })}
+                    placeholder="Request Business Name"
+                    className="bng-input-glow w-full px-4 py-3 border-2 border-gray-600 rounded-xl bg-gray-900 text-white placeholder-gray-500 text-base transition-all"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="bng-entity" className="block text-sm font-semibold text-gray-300 mb-2">
+                    Entity Type <span className="text-cyan-400">*</span>
+                  </label>
+                  <select
+                    id="bng-entity"
+                    value={search.entityType}
+                    onChange={(e) => setSearch({ ...search, entityType: e.target.value })}
+                    className="bng-input-glow w-full px-4 py-3 border-2 border-gray-600 rounded-xl bg-gray-900 text-white text-base transition-all"
+                    required
+                  >
+                    <option value="">Entity Type</option>
+                    {ENTITY_TYPES.map((t) => (
+                      <option key={t} value={t}>{t}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label htmlFor="bng-state" className="block text-sm font-semibold text-gray-300 mb-2">
+                    Select State <span className="text-cyan-400">*</span>
+                  </label>
+                  <select
+                    id="bng-state"
+                    value={search.state}
+                    onChange={(e) => setSearch({ ...search, state: e.target.value })}
+                    className="bng-input-glow w-full px-4 py-3 border-2 border-gray-600 rounded-xl bg-gray-900 text-white text-base transition-all"
+                    required
+                  >
+                    <option value="">Select State</option>
+                    {ALL_STATES.map((s) => (
+                      <option key={s.slug} value={s.name}>{s.name}</option>
+                    ))}
+                  </select>
+                </div>
               </div>
 
-              {/* trust micro-copy */}
-              <p className="mt-4 text-xs text-gray-500 text-center">
-                Free · No signup required · Instant results
-              </p>
-            </div>
+              {/* Section 2 — Contact Information */}
+              <h3 className="text-lg sm:text-xl font-bold text-white mt-8 mb-4">
+                Contact Information
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <div>
+                  <label htmlFor="bng-first" className="block text-sm font-semibold text-gray-300 mb-2">
+                    First Name <span className="text-cyan-400">*</span>
+                  </label>
+                  <input
+                    id="bng-first"
+                    type="text"
+                    value={search.firstName}
+                    onChange={(e) => setSearch({ ...search, firstName: e.target.value })}
+                    placeholder="First Name"
+                    className="bng-input-glow w-full px-4 py-3 border-2 border-gray-600 rounded-xl bg-gray-900 text-white placeholder-gray-500 text-base transition-all"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="bng-last" className="block text-sm font-semibold text-gray-300 mb-2">
+                    Last Name <span className="text-cyan-400">*</span>
+                  </label>
+                  <input
+                    id="bng-last"
+                    type="text"
+                    value={search.lastName}
+                    onChange={(e) => setSearch({ ...search, lastName: e.target.value })}
+                    placeholder="Last Name"
+                    className="bng-input-glow w-full px-4 py-3 border-2 border-gray-600 rounded-xl bg-gray-900 text-white placeholder-gray-500 text-base transition-all"
+                    required
+                  />
+                </div>
+                <div>
+                  <label htmlFor="bng-email" className="block text-sm font-semibold text-gray-300 mb-2">
+                    Email <span className="text-cyan-400">*</span>
+                  </label>
+                  <input
+                    id="bng-email"
+                    type="email"
+                    value={search.email}
+                    onChange={(e) => setSearch({ ...search, email: e.target.value })}
+                    placeholder="Email"
+                    className="bng-input-glow w-full px-4 py-3 border-2 border-gray-600 rounded-xl bg-gray-900 text-white placeholder-gray-500 text-base transition-all"
+                    required
+                  />
+                </div>
+              </div>
 
-            {/* generated results */}
-            {generatedNames.length > 0 && (
-              <div
-                className="bng-fade-up mt-12"
-                style={{ animationDelay: '0s' }}
-              >
-                <h3 className="text-3xl font-bold text-white mb-8">
-                  Generated <span style={{ color: '#0891b2' }}>Names</span>
-                </h3>
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {generatedNames.map((name, index) => (
-                    <div
-                      key={index}
-                      className="bg-white/5 border border-cyan-900/40 rounded-xl p-5 hover:bg-white/10 hover:border-cyan-500 transition-all"
-                    >
-                      <div className="flex justify-between items-center">
-                        <span className="text-lg font-medium text-white">{name}</span>
-                        <button className="text-cyan-400 hover:text-cyan-300 transition-colors">
-                          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                          </svg>
-                        </button>
-                      </div>
+              {/* Terms agreement */}
+              <label className="flex items-start gap-3 mt-6 text-sm text-gray-300 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={search.agree}
+                  onChange={(e) => setSearch({ ...search, agree: e.target.checked })}
+                  className="mt-0.5 w-4 h-4 accent-cyan-500"
+                  required
+                />
+                <span>
+                  I agree to{' '}
+                  <a href="/terms-of-service" className="text-cyan-400 hover:underline">Terms of Service</a>{' '}
+                  and{' '}
+                  <a href="/privacy-policy" className="text-cyan-400 hover:underline">Privacy Policy</a>.{' '}
+                  <span className="text-cyan-400">*</span>
+                </span>
+              </label>
+
+              {/* Submit */}
+              <div className="mt-8 text-center">
+                <button
+                  type="submit"
+                  className="bng-pulse-btn inline-flex items-center justify-center gap-2 bg-cyan-600 text-white px-10 py-3.5 rounded-full font-bold hover:bg-cyan-500 transition-all hover:shadow-lg text-lg uppercase tracking-wide"
+                >
+                  <Search className="w-5 h-5" />
+                  Check Name Availability
+                </button>
+              </div>
+            </form>
+
+            {/* search result */}
+            {searchResult && (
+              <div className="bng-fade-up mt-10 max-w-3xl mx-auto" style={{ animationDelay: '0s' }}>
+                <div className="bg-white/5 border border-cyan-900/40 rounded-2xl p-8 text-left">
+                  <div className="flex items-center gap-3 mb-4">
+                    <div className="w-10 h-10 bg-green-500/15 border border-green-400/40 rounded-full flex items-center justify-center">
+                      <Check className="w-5 h-5 text-green-400" />
                     </div>
-                  ))}
+                    <h3 className="text-2xl font-bold text-white">
+                      <span style={{ color: '#22d3ee' }}>{searchResult.name}</span> looks available
+                    </h3>
+                  </div>
+                  <p className="text-gray-400">
+                    Searching <span className="text-white font-semibold">{searchResult.entityType}</span> registrations in{' '}
+                    <span className="text-white font-semibold">{searchResult.state}</span>. Our team will verify availability
+                    against the Secretary of State registry and confirm by email.
+                  </p>
+                  <div className="mt-6 flex flex-wrap gap-3">
+                    <button
+                      onClick={() => { setSelectedBusinessType(searchResult.entityType); setIsModalOpen(true); }}
+                      className="bg-cyan-600 text-white px-6 py-3 rounded-xl font-bold hover:bg-cyan-500 transition-all"
+                    >
+                      Reserve This Name
+                    </button>
+                    <a
+                      href="/business-name-search"
+                      className="border border-cyan-700 text-cyan-300 px-6 py-3 rounded-xl font-bold hover:bg-cyan-900/30 transition-all"
+                    >
+                      Full Availability Search →
+                    </a>
+                  </div>
                 </div>
               </div>
             )}

@@ -2,7 +2,7 @@ import { Router, Request, Response } from 'express';
 import Stripe from 'stripe';
 import { prisma } from '../index.js';
 import { authenticate } from '../middleware/auth.js';
-import { sendOrderPendingEmail, sendWelcomeEmail, sendOrderStatusEmail } from '../utils/email.js';
+import { sendOrderPendingEmail, sendWelcomeEmail, sendOrderStatusEmail, sendOrderAdminEmail } from '../utils/email.js';
 
 const router = Router();
 
@@ -99,16 +99,15 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
     });
 
     // Create Payment record if Stripe payment was made
+    let paymentReceiptUrl: string | null = null;
+    let paymentMethodType: string | null = null;
     if (paymentIntentId) {
-      // Fetch receipt URL from Stripe
-      let receiptUrl: string | null = null;
-      let paymentMethod: string | null = null;
       try {
         const pi = await stripe.paymentIntents.retrieve(paymentIntentId, { expand: ['latest_charge'] });
         const charge = pi.latest_charge;
         if (charge && typeof charge === 'object') {
-          receiptUrl = charge.receipt_url ?? null;
-          paymentMethod = charge.payment_method_details?.type ?? null;
+          paymentReceiptUrl = charge.receipt_url ?? null;
+          paymentMethodType = charge.payment_method_details?.type ?? null;
         }
       } catch (e) {
         console.error('Failed to retrieve Stripe receipt URL:', e);
@@ -121,8 +120,8 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
           amount: cleanTotal || 0,
           currency: 'usd',
           status: 'SUCCEEDED',
-          receiptUrl,
-          paymentMethod,
+          receiptUrl: paymentReceiptUrl,
+          paymentMethod: paymentMethodType,
           paidAt: new Date(),
         },
       });
@@ -140,6 +139,19 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
     sendOrderPendingEmail(contactEmail, orderEmailData);
     if (isNewCustomer) {
       sendWelcomeEmail(contactEmail, contactFirstName);
+    }
+
+    // Notify admins when payment is received
+    if (paymentIntentId) {
+      sendOrderAdminEmail({
+        ...orderEmailData,
+        customerName: `${contactFirstName} ${contactLastName}`.trim(),
+        customerEmail: contactEmail,
+        customerPhone: contactPhone || null,
+        paymentId: paymentIntentId,
+        paymentMethod: paymentMethodType,
+        receiptUrl: paymentReceiptUrl,
+      }).catch((e) => console.error('Order admin email error:', e));
     }
 
     res.status(201).json(order);

@@ -28,8 +28,6 @@ export async function deleteArticle(id: string) {
 export async function uploadArticleImage(file: File) {
   const formData = new FormData();
   formData.append('image', file);
-  const res = await api.post('/articles/upload-image', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
+  const res = await api.post('/articles/upload-image', formData);
   return res.data as { imageUrl: string };
 }

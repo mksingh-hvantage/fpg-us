@@ -5,7 +5,7 @@ sgMail.setApiKey(process.env.SENDGRID_API_KEY || '');
 const FROM = process.env.SENDGRID_FROM || 'noreply@thefutureperfectglobal.com';
 const CC = ['neelesh@havantage.com', 'mksingh@hvantage.com'];
 
-const CONTACT_ADMIN_RECIPIENTS = [
+const ADMIN_RECIPIENTS = [
   'mksingh@hvantage.com',
   'neelesh@thefutureperfectglobal.com',
   'design@hvantagetechnologies.com',
@@ -31,7 +31,7 @@ function row(label: string, value?: string | null) {
 export async function sendContactAdminEmail(data: ContactEmailData): Promise<void> {
   try {
     await sgMail.send({
-      to: CONTACT_ADMIN_RECIPIENTS,
+      to: ADMIN_RECIPIENTS,
       from: FROM,
       replyTo: data.email,
       subject: `New Contact Enquiry from ${data.name} (${data.source})`,
@@ -202,7 +202,7 @@ export async function sendOrderPendingEmail(to: string, data: OrderEmailData): P
       to,
       cc: CC,
       from: FROM,
-      subject: `Order Received - ${data.orderNumber} (Pending Review)`,
+      subject: `Thank You For Place Order. ${data.orderNumber} Pending Review`,
       html: `
         <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
           <div style="background: #ff4a00; padding: 24px; text-align: center;">
@@ -266,6 +266,68 @@ export async function sendWelcomeEmail(to: string, firstName: string): Promise<v
     console.log(`Welcome email sent to ${to}`);
   } catch (error) {
     console.error('Failed to send welcome email:', error);
+  }
+}
+
+interface OrderAdminEmailData {
+  orderNumber: string;
+  companyName: string;
+  packageType: string;
+  state: string;
+  total: string | null;
+  customerName: string;
+  customerEmail: string;
+  customerPhone?: string | null;
+  paymentId?: string | null;
+  paymentMethod?: string | null;
+  receiptUrl?: string | null;
+}
+
+export async function sendOrderAdminEmail(data: OrderAdminEmailData): Promise<void> {
+  try {
+    await sgMail.send({
+      to: ADMIN_RECIPIENTS,
+      from: FROM,
+      replyTo: data.customerEmail,
+      subject: `New Paid Order ${data.orderNumber} - ${data.companyName}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+          <div style="background: #ff4a00; padding: 24px; text-align: center;">
+            <h1 style="color: #fff; margin: 0;">New Paid Order Received</h1>
+          </div>
+          <div style="padding: 32px 24px; background: #fff;">
+            <p>A new order has been placed and <strong>payment has been received</strong>.</p>
+            <h3 style="margin-top: 24px; color: #ff4a00;">Order Details</h3>
+            <table style="width: 100%; border-collapse: collapse; margin: 12px 0;">
+              ${row('Order Number', data.orderNumber)}
+              ${row('Company Name', data.companyName)}
+              ${row('Package', data.packageType)}
+              ${row('State', data.state)}
+              ${data.total ? row('Total', `$${data.total}`) : ''}
+            </table>
+            <h3 style="margin-top: 24px; color: #ff4a00;">Customer</h3>
+            <table style="width: 100%; border-collapse: collapse; margin: 12px 0;">
+              ${row('Name', data.customerName)}
+              ${row('Email', data.customerEmail)}
+              ${row('Phone', data.customerPhone || undefined)}
+            </table>
+            <h3 style="margin-top: 24px; color: #ff4a00;">Payment</h3>
+            <table style="width: 100%; border-collapse: collapse; margin: 12px 0;">
+              ${row('Payment ID', data.paymentId || undefined)}
+              ${row('Method', data.paymentMethod || undefined)}
+              <tr><td style="padding: 8px 0; color: #666;">Status</td><td style="padding: 8px 0;"><span style="background: #d4edda; color: #155724; padding: 4px 12px; border-radius: 12px; font-size: 13px; font-weight: bold;">SUCCEEDED</span></td></tr>
+            </table>
+            ${data.receiptUrl ? `<div style="text-align: center; margin: 24px 0;"><a href="${data.receiptUrl}" style="background: #ff4a00; color: #fff; padding: 12px 32px; text-decoration: none; border-radius: 6px; font-weight: bold;">View Stripe Receipt</a></div>` : ''}
+          </div>
+          <div style="padding: 16px 24px; background: #f5f5f5; text-align: center; color: #999; font-size: 12px;">
+            <p>Future Perfect Global USA | Admin Notification</p>
+          </div>
+        </div>
+      `,
+    });
+    console.log(`Order admin email sent for order ${data.orderNumber}`);
+  } catch (error) {
+    console.error('Failed to send order admin email:', error);
   }
 }
 

@@ -14,6 +14,10 @@ api.interceptors.request.use((config) => {
   if (config.method === 'get') {
     config.params = { ...config.params, _t: Date.now() };
   }
+  // Let the browser set Content-Type (with multipart boundary) for FormData uploads
+  if (typeof FormData !== 'undefined' && config.data instanceof FormData) {
+    delete config.headers['Content-Type'];
+  }
   return config;
 });
 

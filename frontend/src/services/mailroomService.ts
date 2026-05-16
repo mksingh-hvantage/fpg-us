@@ -12,9 +12,7 @@ export async function getMailItem(id: string) {
 }
 
 export async function createMailItem(formData: FormData) {
-  const res = await api.post('/mailroom', formData, {
-    headers: { 'Content-Type': 'multipart/form-data' },
-  });
+  const res = await api.post('/mailroom', formData);
   return res.data as MailItem;
 }
 
